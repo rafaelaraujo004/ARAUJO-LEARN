@@ -208,17 +208,30 @@
 
   /* Fundo do topo público: profundidade sem imagem pesada. */
   .bg-night {
-    background:
-      radial-gradient(60rem 30rem at 15% -10%, rgb(42 109 168 / 0.35), transparent 60%),
-      radial-gradient(45rem 28rem at 95% 0%, rgb(224 154 62 / 0.18), transparent 55%),
+    background-color: var(--color-brand-950);
+    background-image:
+      radial-gradient(60rem 30rem at 15% -10%, rgb(42 109 168 / 0.38), transparent 60%),
+      radial-gradient(45rem 28rem at 95% 0%, rgb(224 154 62 / 0.2), transparent 55%),
       linear-gradient(180deg, var(--color-brand-950) 0%, var(--color-brand-900) 100%);
   }
 
+  /*
+   * A grade vive em um pseudo-elemento: se fosse `background-image`, sobrescreveria
+   * os gradientes de `.bg-night` quando as duas classes fossem usadas juntas.
+   */
   .bg-grid {
+    position: relative;
+  }
+  .bg-grid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
     background-image:
-      linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+      linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
     background-size: 3.5rem 3.5rem;
+    mask-image: radial-gradient(90% 70% at 50% 0%, #000 30%, transparent 100%);
   }
 
   /* Texto com acabamento de marca, usado no slogan e em números-chave. */
@@ -226,8 +239,8 @@
     background: linear-gradient(
       92deg,
       var(--color-accent-300) 0%,
-      var(--color-accent-200) 40%,
-      #ffffff 100%
+      var(--color-accent-200) 55%,
+      var(--color-accent-300) 100%
     );
     -webkit-background-clip: text;
     background-clip: text;

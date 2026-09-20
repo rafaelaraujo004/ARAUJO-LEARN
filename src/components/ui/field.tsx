@@ -18,9 +18,13 @@ const CONTROL =
 
 const INVALID = 'border-danger-500 hover:border-danger-500 focus:border-danger-500';
 
-let idCounter = 0;
+/**
+ * `useId` do React gera o mesmo identificador no servidor e no cliente.
+ * Um contador de módulo parece funcionar, mas quebra a hidratação quando a
+ * ordem de renderização difere entre os dois lados.
+ */
 function useFieldId(provided?: string): string {
-  const [generated] = React.useState(() => `field-${++idCounter}`);
+  const generated = React.useId();
   return provided ?? generated;
 }
 

@@ -96,7 +96,7 @@ export async function revokeCertificateAction(code: string): Promise<FormState> 
   await requireStaff();
   await db.certificate.update({ where: { code }, data: { revokedAt: new Date() } });
   revalidatePath('/admin/certificados');
-  revalidatePath(`/certificados/${code}`);
+  revalidatePath(`/validar/${code}`);
   return { ok: true, message: 'Certificado revogado.' };
 }
 

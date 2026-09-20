@@ -3,9 +3,21 @@ import { cn } from '@/lib/utils';
 /**
  * Marca ARAÚJO LEARN.
  *
- * O símbolo é um "A" construído por três degraus ascendentes — a leitura visual
- * do slogan: Aprenda (base), Evolua (meio), Conquiste (topo, em dourado).
+ * O símbolo é o "A" original do Rafael (`public/marca/a.png`). Ele é aplicado
+ * como máscara CSS em vez de <img>: assim o mesmo arquivo serve em fundo claro
+ * e escuro, assumindo a cor do texto ao redor — sem precisar de duas versões.
  */
+
+const MARK_STYLE: React.CSSProperties = {
+  WebkitMaskImage: 'url(/marca/a.png)',
+  maskImage: 'url(/marca/a.png)',
+  WebkitMaskRepeat: 'no-repeat',
+  maskRepeat: 'no-repeat',
+  WebkitMaskPosition: 'center',
+  maskPosition: 'center',
+  WebkitMaskSize: 'contain',
+  maskSize: 'contain',
+};
 
 export function LogoMark({
   className,
@@ -15,21 +27,12 @@ export function LogoMark({
   title?: string;
 }) {
   return (
-    <svg
-      viewBox="0 0 40 40"
+    <span
       role="img"
       aria-label={title}
-      className={cn('h-9 w-9', className)}
-      fill="none"
-    >
-      <rect width="40" height="40" rx="11" className="fill-brand-900" />
-      {/* degrau 1 — Aprenda */}
-      <path d="M9 30h6.4l2.2-5.4H14L9 30Z" className="fill-brand-400" />
-      {/* degrau 2 — Evolua */}
-      <path d="M15.7 23.2h7.5l2.2-5.4h-7.5l-2.2 5.4Z" className="fill-brand-200" />
-      {/* topo — Conquiste */}
-      <path d="M22.4 16.4 25.9 8l5.1 22h-6.2l-1.6-7.6h-4.3l3.5-6Z" className="fill-accent-300" />
-    </svg>
+      style={MARK_STYLE}
+      className={cn('inline-block size-9 shrink-0 bg-current', className)}
+    />
   );
 }
 
@@ -44,7 +47,7 @@ export function Logo({
 }) {
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <LogoMark />
+      <LogoMark className={variant === 'light' ? 'text-white' : 'text-brand-900'} />
       <span className="flex flex-col leading-none">
         <span
           className={cn(
@@ -52,7 +55,8 @@ export function Logo({
             variant === 'light' ? 'text-white' : 'text-brand-900',
           )}
         >
-          ARAÚJO<span className={variant === 'light' ? 'text-accent-300' : 'text-accent-500'}>
+          ARAÚJO
+          <span className={variant === 'light' ? 'text-accent-300' : 'text-accent-500'}>
             {' '}
             LEARN
           </span>
@@ -67,6 +71,60 @@ export function Logo({
             Aprenda. Evolua. Conquiste.
           </span>
         )}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Assinatura do tutor — o "A" sobre o nome, como na marca pessoal do Amilton.
+ *
+ * Usada onde quem assina é a pessoa, não a plataforma: certificado, perfil do
+ * tutor e cartão do tutor na página do curso.
+ */
+export function TutorSignature({
+  name = 'AMILTON',
+  surname = 'ARAÚJO',
+  prefix = 'ENG.',
+  variant = 'dark',
+  size = 'md',
+  className,
+}: {
+  name?: string;
+  surname?: string;
+  prefix?: string;
+  variant?: 'dark' | 'light';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}) {
+  const marks = { sm: 'size-10', md: 'size-16', lg: 'size-24' } as const;
+  const names = { sm: 'text-base', md: 'text-2xl', lg: 'text-4xl' } as const;
+  const prefixes = { sm: 'text-[0.5rem]', md: 'text-[0.625rem]', lg: 'text-xs' } as const;
+
+  const ink = variant === 'light' ? 'text-white' : 'text-brand-900';
+
+  return (
+    <span
+      className={cn('inline-flex flex-col items-center', ink, className)}
+      role="img"
+      aria-label={`${prefix} ${name} ${surname}`}
+    >
+      <span style={MARK_STYLE} aria-hidden className={cn('bg-current', marks[size])} />
+      <span
+        aria-hidden
+        className={cn(
+          'mt-1.5 font-semibold tracking-[0.3em]',
+          prefixes[size],
+          variant === 'light' ? 'text-brand-200' : 'text-ink-600',
+        )}
+      >
+        {prefix} {name}
+      </span>
+      <span
+        aria-hidden
+        className={cn('font-sans leading-none font-extrabold tracking-[0.04em]', names[size])}
+      >
+        {surname}
       </span>
     </span>
   );

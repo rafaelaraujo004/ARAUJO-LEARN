@@ -114,9 +114,13 @@ export function CourseCard({
               <p className="font-display text-xl font-semibold text-brand-900">
                 {formatPrice(course.priceCents)}
               </p>
+              {/* Duas linhas de propósito: na mesma linha, o "até 12x" parecia
+                  fazer parte da condição do PIX. */}
               <p className="text-xs text-ink-500">
-                {formatPrice(pixPrice(course.priceCents, course.pixDiscountPercent))} no PIX · até{' '}
-                {course.maxInstallments}x
+                {formatPrice(pixPrice(course.priceCents, course.pixDiscountPercent))} à vista no PIX
+              </p>
+              <p className="text-xs text-ink-500">
+                ou até {course.maxInstallments}x no cartão
               </p>
             </div>
           ) : (

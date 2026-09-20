@@ -215,10 +215,11 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                             {formatPrice(course.priceCents)}
                           </p>
                           <p className="mt-1 text-sm text-ink-600">
-                            {formatPrice(
-                              pixPrice(course.priceCents, course.pixDiscountPercent),
-                            )}{' '}
-                            no PIX · até {course.maxInstallments}x no cartão
+                            {formatPrice(pixPrice(course.priceCents, course.pixDiscountPercent))}{' '}
+                            à vista no PIX
+                          </p>
+                          <p className="text-sm text-ink-600">
+                            ou até {course.maxInstallments}x no cartão de crédito
                           </p>
                         </>
                       )}

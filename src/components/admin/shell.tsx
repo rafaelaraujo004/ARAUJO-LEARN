@@ -81,7 +81,7 @@ export function AdminShell({
         </Link>
         <button
           type="button"
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="admin-nav"
           aria-label={open ? 'Fechar menu' : 'Abrir menu'}

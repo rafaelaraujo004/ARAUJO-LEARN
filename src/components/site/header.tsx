@@ -83,7 +83,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 
         <button
           type="button"
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="menu-mobile"
           aria-label={open ? 'Fechar menu' : 'Abrir menu'}

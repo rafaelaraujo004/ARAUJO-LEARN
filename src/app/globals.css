@@ -11,18 +11,20 @@
    =========================================================================== */
 
 @theme {
-  /* --- Marca: azul-noite ------------------------------------------------ */
-  --color-brand-50: #f1f7fc;
-  --color-brand-100: #dcebf7;
-  --color-brand-200: #bcd8ef;
-  --color-brand-300: #8cbee4;
-  --color-brand-400: #4b93ce;
-  --color-brand-500: #2a6da8;
-  --color-brand-600: #1d4e7d;
-  --color-brand-700: #17395a;
-  --color-brand-800: #12293f;
-  --color-brand-900: #0c1b2e;
-  --color-brand-950: #07111f;
+  /* --- Marca: azul do "A" ----------------------------------------------
+     O tom 900 é o azul exato do logo enviado (#0c2456). Toda a escala foi
+     construída em volta dele, para que a interface e a marca sejam a mesma cor. */
+  --color-brand-50: #f1f6fd;
+  --color-brand-100: #dfebf9;
+  --color-brand-200: #c0d8f2;
+  --color-brand-300: #95bce8;
+  --color-brand-400: #6199d9;
+  --color-brand-500: #3a76c9;
+  --color-brand-600: #2a5cae;
+  --color-brand-700: #1d468f;
+  --color-brand-800: #143471;
+  --color-brand-900: #0c2456;
+  --color-brand-950: #071433;
 
   /* --- Acento: conquista ------------------------------------------------ */
   --color-accent-50: #fdf6ea;
@@ -210,7 +212,7 @@
   .bg-night {
     background-color: var(--color-brand-950);
     background-image:
-      radial-gradient(60rem 30rem at 15% -10%, rgb(42 109 168 / 0.38), transparent 60%),
+      radial-gradient(60rem 30rem at 15% -10%, rgb(58 118 201 / 0.4), transparent 60%),
       radial-gradient(45rem 28rem at 95% 0%, rgb(224 154 62 / 0.2), transparent 55%),
       linear-gradient(180deg, var(--color-brand-950) 0%, var(--color-brand-900) 100%);
   }

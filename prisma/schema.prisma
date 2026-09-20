@@ -1,0 +1,479 @@
+// ARAÚJO LEARN — modelo de dados
+//
+// Princípios:
+// - O banco guarda METADADOS e REFERÊNCIAS. Nenhum binário (vídeo/PDF) vive aqui.
+// - MediaAsset isola o armazenamento: trocar Railway Bucket por Cloudflare Stream
+//   é mudar `provider` + `externalId`, sem tocar em Aula/Curso.
+// - Enrollment é o ponto único de controle de acesso; novos modelos (plano,
+//   assinatura, acesso temporário) entram por `source`/`expiresAt` sem migração estrutural.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------- Identidade
+
+enum Role {
+  STUDENT
+  TUTOR
+  ADMIN
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(STUDENT)
+  avatarKey    String?
+  headline     String?
+  bio          String?
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tutorProfile   TutorProfile?
+  sessions       Session[]
+  resetTokens    PasswordResetToken[]
+  enrollments    Enrollment[]
+  lessonProgress LessonProgress[]
+  attempts       ActivityAttempt[]
+  certificates   Certificate[]
+  notifications  Notification[]
+  coursesTaught  Course[]             @relation("CourseTutor")
+  uploads        MediaAsset[]         @relation("MediaUploader")
+
+  @@index([role])
+}
+
+/// Sessão opaca: o cookie guarda um token aleatório; só o hash fica no banco.
+/// Permite revogar acesso de verdade (logout em todos os dispositivos).
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+/// Identidade pública do tutor — é a marca da plataforma.
+model TutorProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline    String?
+  bio         String?
+  experience  String?
+  methodology String?
+  specialties String[] @default([])
+  socials     Json     @default("{}")
+  photoKey    String?
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ------------------------------------------------------------------- Conteúdo
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// FREE: aluno autenticado se matricula sozinho.
+/// RESTRICTED: só com liberação do tutor. Base para planos/assinatura no futuro.
+enum CourseAccessType {
+  FREE
+  RESTRICTED
+}
+
+model Course {
+  id                 String           @id @default(cuid())
+  slug               String           @unique
+  title              String
+  shortDescription   String
+  description        String?
+  objective          String?
+  audience           String?
+  level              CourseLevel      @default(BEGINNER)
+  status             CourseStatus     @default(DRAFT)
+  accessType         CourseAccessType @default(FREE)
+  coverKey           String?
+  /// Carga horária declarada (minutos). Se nula, usa a soma das aulas.
+  durationMinutes    Int?
+  certificateEnabled Boolean          @default(true)
+  position           Int              @default(0)
+  tutorId            String
+  tutor              User             @relation("CourseTutor", fields: [tutorId], references: [id])
+  publishedAt        DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  modules      Module[]
+  materials    Material[]
+  activities   Activity[]
+  enrollments  Enrollment[]
+  certificates Certificate[]
+
+  @@index([status, publishedAt])
+  @@index([tutorId])
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons    Lesson[]
+  materials  Material[]
+  activities Activity[]
+
+  @@index([courseId, position])
+}
+
+model Lesson {
+  id              String      @id @default(cuid())
+  moduleId        String
+  module          Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title           String
+  slug            String
+  description     String?
+  /// Conteúdo textual da aula (Markdown). Uma aula pode existir sem vídeo.
+  content         String?
+  notes           String?
+  position        Int         @default(0)
+  /// Duração em segundos: vem do vídeo, ou é informada pelo tutor em aulas de texto.
+  durationSeconds Int         @default(0)
+  /// Aula de amostra: visível sem matrícula.
+  isPreview       Boolean     @default(false)
+  isPublished     Boolean     @default(true)
+  videoId         String?
+  video           MediaAsset? @relation("LessonVideo", fields: [videoId], references: [id], onDelete: SetNull)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  materials  Material[]
+  activities Activity[]
+  progress   LessonProgress[]
+  lastSeenBy Enrollment[]     @relation("LastLesson")
+
+  @@unique([moduleId, slug])
+  @@index([moduleId, position])
+}
+
+// -------------------------------------------------------------------- Mídia
+
+enum MediaKind {
+  VIDEO
+  DOCUMENT
+  IMAGE
+}
+
+enum MediaStatus {
+  PENDING
+  READY
+  FAILED
+}
+
+/// Camada de abstração do armazenamento.
+/// `provider` = s3 | local | (futuro) cloudflare-stream, mux…
+/// `externalId` guarda o id do provedor especializado quando houver.
+model MediaAsset {
+  id              String      @id @default(cuid())
+  kind            MediaKind
+  provider        String      @default("s3")
+  storageKey      String
+  externalId      String?
+  originalName    String
+  mimeType        String
+  sizeBytes       BigInt      @default(0)
+  durationSeconds Int?
+  width           Int?
+  height          Int?
+  status          MediaStatus @default(PENDING)
+  /// Id do multipart upload em andamento (permite retomada/cancelamento).
+  uploadId        String?
+  checksum        String?
+  createdById     String?
+  createdBy       User?       @relation("MediaUploader", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  lessons   Lesson[]   @relation("LessonVideo")
+  materials Material[]
+
+  @@index([kind, status])
+  @@index([createdById])
+}
+
+enum MaterialType {
+  FILE
+  LINK
+}
+
+model Material {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  type        MaterialType @default(FILE)
+  url         String?
+  mediaId     String?
+  media       MediaAsset?  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  position    Int          @default(0)
+  lessonId    String?
+  lesson      Lesson?      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  moduleId    String?
+  module      Module?      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  courseId    String?
+  course      Course?      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([lessonId])
+  @@index([moduleId])
+  @@index([courseId])
+}
+
+// ---------------------------------------------------------------- Atividades
+
+enum ActivityType {
+  QUIZ
+  EXERCISE
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  TEXT
+}
+
+model Activity {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  type         ActivityType @default(QUIZ)
+  /// Obrigatória para concluir o curso.
+  isRequired   Boolean      @default(true)
+  passingScore Int          @default(70)
+  maxAttempts  Int?
+  position     Int          @default(0)
+  isPublished  Boolean      @default(true)
+  courseId     String
+  course       Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  moduleId     String?
+  module       Module?      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lessonId     String?
+  lesson       Lesson?      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  questions Question[]
+  attempts  ActivityAttempt[]
+
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([moduleId])
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  activityId  String
+  activity    Activity     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  prompt      String
+  type        QuestionType @default(SINGLE_CHOICE)
+  explanation String?
+  points      Int          @default(1)
+  position    Int          @default(0)
+
+  options QuestionOption[]
+  answers AnswerRecord[]
+
+  @@index([activityId, position])
+}
+
+model QuestionOption {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean  @default(false)
+  position   Int      @default(0)
+
+  @@index([questionId, position])
+}
+
+model ActivityAttempt {
+  id          String    @id @default(cuid())
+  activityId  String
+  activity    Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score       Int       @default(0)
+  maxScore    Int       @default(0)
+  passed      Boolean   @default(false)
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+
+  answers AnswerRecord[]
+
+  @@index([userId, activityId])
+}
+
+model AnswerRecord {
+  id                String          @id @default(cuid())
+  attemptId         String
+  attempt           ActivityAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId        String
+  question          Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOptionIds String[]        @default([])
+  textAnswer        String?
+  isCorrect         Boolean         @default(false)
+  pointsAwarded     Int             @default(0)
+
+  @@unique([attemptId, questionId])
+}
+
+// ------------------------------------------------------ Acesso e aprendizado
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  REVOKED
+}
+
+/// Ponto único de controle de acesso ao conteúdo.
+/// `source` e `expiresAt` já preparam acesso temporário, por plano ou assinatura.
+model Enrollment {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId        String
+  course          Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status          EnrollmentStatus @default(ACTIVE)
+  /// self | tutor | seed | (futuro) purchase, plan, subscription
+  source          String           @default("self")
+  expiresAt       DateTime?
+  progressPercent Int              @default(0)
+  lastLessonId    String?
+  lastLesson      Lesson?          @relation("LastLesson", fields: [lastLessonId], references: [id], onDelete: SetNull)
+  lastActivityAt  DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  certificate Certificate?
+
+  @@unique([userId, courseId])
+  @@index([courseId, status])
+  @@index([userId, status])
+}
+
+enum LessonProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model LessonProgress {
+  id                  String               @id @default(cuid())
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId            String
+  lesson              Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status              LessonProgressStatus @default(NOT_STARTED)
+  /// Posição para retomar a reprodução exatamente de onde parou.
+  lastPositionSeconds Int                  @default(0)
+  watchedSeconds      Int                  @default(0)
+  percent             Int                  @default(0)
+  startedAt           DateTime?
+  completedAt         DateTime?
+  lastActivityAt      DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@unique([userId, lessonId])
+  @@index([userId, lastActivityAt])
+}
+
+// -------------------------------------------------------------- Certificados
+
+model Certificate {
+  id           String     @id @default(cuid())
+  /// Código público de validação (ex.: AL-7F3K-9QX2).
+  code         String     @unique
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrollmentId String     @unique
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  /// Congelado na emissão: o certificado não muda se o curso mudar depois.
+  studentName  String
+  courseTitle  String
+  tutorName    String
+  hours        Int
+  issuedAt     DateTime   @default(now())
+  revokedAt    DateTime?
+  pdfKey       String?
+
+  @@index([userId])
+  @@index([courseId])
+}
+
+// ------------------------------------------------- Notificações e ajustes
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String    @default("info")
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+}
+
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}

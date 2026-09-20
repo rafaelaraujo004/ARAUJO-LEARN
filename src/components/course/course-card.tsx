@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { Award, BookOpen, Clock, Layers, PlayCircle } from 'lucide-react';
+import { Award, BookOpen, Clock, Gift, Layers, PlayCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/primitives';
 import { LEVEL_LABEL } from '@/lib/constants';
-import { formatDuration, pluralize } from '@/lib/utils';
+import { formatDuration, formatPrice, pixPrice, pluralize } from '@/lib/utils';
 import type { CourseCardData } from '@/server/courses';
 
 /**
@@ -20,19 +20,19 @@ export function CourseCard({
   href?: string;
   ctaLabel?: string;
 }) {
-  const duration =
-    course.durationSeconds > 0
+  // A carga horária declarada é o número oficial do curso; a soma das aulas
+  // só entra quando o tutor não declarou nada.
+  const duration = course.durationMinutes
+    ? formatDuration(course.durationMinutes * 60)
+    : course.durationSeconds > 0
       ? formatDuration(course.durationSeconds)
-      : course.durationMinutes
-        ? formatDuration(course.durationMinutes * 60)
-        : null;
+      : null;
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-card border border-ink-200 bg-white shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-lift">
       <div className="relative aspect-[16/9] overflow-hidden bg-brand-900">
         {course.coverUrl ? (
           // Capa vem do bucket com URL assinada; `next/image` não otimiza URL temporária.
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={course.coverUrl}
             alt=""
@@ -104,11 +104,31 @@ export function CourseCard({
           </div>
         )}
 
-        {ctaLabel && (
-          <p className="mt-4 text-sm font-semibold text-brand-600 transition-colors group-hover:text-brand-500">
-            {ctaLabel} →
-          </p>
-        )}
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-4">
+          {course.isBonus ? (
+            <Badge tone="accent" icon={<Gift className="size-3" />}>
+              Bônus da formação
+            </Badge>
+          ) : course.priceCents ? (
+            <div>
+              <p className="font-display text-xl font-semibold text-brand-900">
+                {formatPrice(course.priceCents)}
+              </p>
+              <p className="text-xs text-ink-500">
+                {formatPrice(pixPrice(course.priceCents, course.pixDiscountPercent))} no PIX · até{' '}
+                {course.maxInstallments}x
+              </p>
+            </div>
+          ) : (
+            <span />
+          )}
+
+          {ctaLabel && (
+            <p className="text-sm font-semibold text-brand-600 transition-colors group-hover:text-brand-500">
+              {ctaLabel} →
+            </p>
+          )}
+        </div>
       </div>
     </article>
   );

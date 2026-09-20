@@ -63,7 +63,6 @@ export function CourseSettings({
         <div className="p-5">
           {coverUrl && (
             <div className="mb-4 overflow-hidden rounded-xl border border-ink-200">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={coverUrl} alt="Capa atual do curso" className="aspect-[16/9] w-full object-cover" />
             </div>
           )}

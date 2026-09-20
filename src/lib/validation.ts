@@ -80,6 +80,12 @@ export const courseSchema = z.object({
   accessType: courseAccessSchema,
   durationMinutes: z.coerce.number().int().min(0).max(100_000).nullable().optional(),
   certificateEnabled: z.boolean(),
+  /// Em reais no formulário; convertido para centavos antes de gravar.
+  priceCents: z.coerce.number().int().min(0).max(10_000_000).nullable().optional(),
+  pixDiscountPercent: z.coerce.number().int().min(0).max(90),
+  maxInstallments: z.coerce.number().int().min(1).max(24),
+  includes: z.array(trimmed(80)).max(10).default([]),
+  isBonus: z.boolean(),
 });
 
 export const moduleSchema = z.object({

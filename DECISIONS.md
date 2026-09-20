@@ -41,9 +41,13 @@ O modo autônomo foi solicitado, então as regras de negócio abaixo foram **dec
 padrão mais seguro e reversível**. Todas são configuráveis sem alteração de schema.
 Revise-as quando quiser — a coluna "Como mudar" indica o caminho.
 
+> **Atualizado depois que o Rafael informou o conteúdo real** (cursos de engenharia
+> civil, pagos, do Eng. Amilton Araújo). As decisões abaixo refletem esse modelo.
+
 | Pergunta | Decisão adotada | Como mudar |
 |---|---|---|
-| Curso gratuito ou pago? | **Gratuito com matrícula**: o aluno logado se matricula sozinho em cursos publicados marcados como `FREE`. Cursos `RESTRICTED` só por liberação do tutor. | Campo `Course.accessType` no painel do curso |
+| Curso gratuito ou pago? | **Pago, com liberação manual.** O preço aparece na plataforma; o pagamento é combinado direto com o tutor (PIX com 10% ou até 12x no cartão). O aluno registra um **pedido de matrícula**, o tutor confirma e libera em um clique. Sem gateway na primeira versão — o modelo `EnrollmentRequest` já é o ponto de entrada de um gateway futuro. | Campos de preço no painel do curso; aprovação em **Solicitações** |
+| Curso bônus | `Legislação de Obra e Sistema CREA` é **liberado automaticamente** quando o aluno tem acesso ativo aos dois cursos pagos (`Course.unlocksWithCourseIds`). | Campo `isBonus` + `unlocksWithCourseIds` |
 | Acesso permanente ou temporário? | **Permanente por padrão** (`Enrollment.expiresAt = null`). O campo já existe para acesso temporário futuro. | `Enrollment.expiresAt` |
 | Certificado obrigatório? | **Emissão automática ao concluir 100% do curso**, se `Course.certificateEnabled = true` (padrão: true). | Toggle no painel do curso |
 | Conteúdo visível para todos? | Aula pode ser marcada como **`isPreview`** (amostra pública). Padrão: não. | Toggle na aula |

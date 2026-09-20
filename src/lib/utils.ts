@@ -102,3 +102,26 @@ export function pluralize(count: number, one: string, many: string): string {
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
+
+/** 19900 -> "R$ 199,00" */
+export function formatPrice(cents: number): string {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+    cents / 100,
+  );
+}
+
+/** Preço com o desconto do PIX aplicado. */
+export function pixPrice(cents: number, discountPercent: number): number {
+  return Math.round(cents * (1 - discountPercent / 100));
+}
+
+/** Valor de cada parcela, arredondado para cima no centavo. */
+export function installmentPrice(cents: number, installments: number): number {
+  return Math.ceil(cents / Math.max(1, installments));
+}
+
+/** "(94) 99190-6608" -> "5594991906608" (formato aceito pelo wa.me) */
+export function whatsappDigits(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  return digits.startsWith('55') ? digits : `55${digits}`;
+}

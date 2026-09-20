@@ -165,22 +165,76 @@ export async function selfEnroll(
 export async function grantAccess(
   userId: string,
   courseId: string,
-  options: { expiresAt?: Date | null } = {},
+  options: { expiresAt?: Date | null; source?: string } = {},
 ): Promise<void> {
   await db.enrollment.upsert({
     where: { userId_courseId: { userId, courseId } },
     create: {
       userId,
       courseId,
-      source: 'tutor',
+      source: options.source ?? 'tutor',
       expiresAt: options.expiresAt ?? null,
     },
     update: {
       status: 'ACTIVE',
-      source: 'tutor',
+      source: options.source ?? 'tutor',
       expiresAt: options.expiresAt ?? null,
     },
   });
+
+  await unlockBonusCourses(userId);
+}
+
+/**
+ * Libera automaticamente os cursos bônus.
+ *
+ * Um curso bônus declara em `unlocksWithCourseIds` de quais cursos ele depende.
+ * Assim que o aluno tem acesso ativo a todos eles, o bônus entra sozinho — sem
+ * o tutor precisar lembrar de liberar.
+ *
+ * Devolve os títulos liberados nesta chamada.
+ */
+export async function unlockBonusCourses(userId: string): Promise<string[]> {
+  const bonuses = await db.course.findMany({
+    where: { isBonus: true, status: { not: 'ARCHIVED' } },
+    select: { id: true, title: true, unlocksWithCourseIds: true },
+  });
+  if (bonuses.length === 0) return [];
+
+  const active = new Set(
+    (
+      await db.enrollment.findMany({
+        where: { userId, status: { in: ['ACTIVE', 'COMPLETED'] } },
+        select: { courseId: true },
+      })
+    ).map((item) => item.courseId),
+  );
+
+  const unlocked: string[] = [];
+
+  for (const bonus of bonuses) {
+    if (bonus.unlocksWithCourseIds.length === 0) continue;
+    if (active.has(bonus.id)) continue;
+    if (!bonus.unlocksWithCourseIds.every((required) => active.has(required))) continue;
+
+    await db.enrollment.upsert({
+      where: { userId_courseId: { userId, courseId: bonus.id } },
+      create: { userId, courseId: bonus.id, source: 'bonus' },
+      update: { status: 'ACTIVE', source: 'bonus' },
+    });
+    await db.notification.create({
+      data: {
+        userId,
+        type: 'bonus',
+        title: 'Curso bônus liberado',
+        body: `Você garantiu o bônus "${bonus.title}". Ele já está nos seus cursos.`,
+        link: '/meus-cursos',
+      },
+    });
+    unlocked.push(bonus.title);
+  }
+
+  return unlocked;
 }
 
 export async function revokeAccess(userId: string, courseId: string): Promise<void> {

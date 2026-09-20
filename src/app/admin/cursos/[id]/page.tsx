@@ -37,6 +37,11 @@ export default async function EditCoursePage({ params }: { params: Promise<{ id:
       coverKey: true,
       durationMinutes: true,
       certificateEnabled: true,
+      priceCents: true,
+      pixDiscountPercent: true,
+      maxInstallments: true,
+      includes: true,
+      isBonus: true,
       _count: { select: { enrollments: true } },
     },
   });
@@ -84,6 +89,11 @@ export default async function EditCoursePage({ params }: { params: Promise<{ id:
             accessType: course.accessType,
             durationMinutes: course.durationMinutes,
             certificateEnabled: course.certificateEnabled,
+            priceCents: course.priceCents,
+            pixDiscountPercent: course.pixDiscountPercent,
+            maxInstallments: course.maxInstallments,
+            includes: course.includes,
+            isBonus: course.isBonus,
           }}
         />
 

@@ -109,7 +109,9 @@ if (failed) process.exit(1);
 
 // 3. Instalar offline a partir dos arquivos locais
 fs.writeFileSync(LOCK, JSON.stringify(lock, null, 2));
-const code = run('npm', ['ci', '--offline', '--no-audit', '--no-fund']);
+// 'npm install --offline' preserva o node_modules existente; 'npm ci' apagaria
+// tudo e falharia em arquivos nativos travados por um processo em execução.
+const code = run('npm', ['install', '--offline', '--no-audit', '--no-fund']);
 
 // 4. Restaurar o lockfile publicável
 fs.copyFileSync(BACKUP, LOCK);

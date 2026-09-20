@@ -47,7 +47,7 @@ export function LessonEditor({ lesson }: { lesson: LessonEditorData }) {
   const [isPreview, setIsPreview] = React.useState(lesson.isPreview);
   const [isPublished, setIsPublished] = React.useState(lesson.isPublished);
   const [busy, setBusy] = React.useState(false);
-  const [materialOpen, setMaterialOpen] = React.useState(false);
+  const [materialOpen, setMaterialOpen] = React.useState(0);
   const [removingMaterial, setRemovingMaterial] = React.useState<{ id: string; title: string } | null>(
     null,
   );
@@ -192,7 +192,7 @@ export function LessonEditor({ lesson }: { lesson: LessonEditorData }) {
           title="Materiais da aula"
           description="Arquivos para download e links de apoio."
           action={
-            <Button variant="secondary" size="sm" onClick={() => setMaterialOpen(true)}>
+            <Button variant="secondary" size="sm" onClick={() => setMaterialOpen((n) => n + 1)}>
               <Plus aria-hidden className="size-4" />
               Adicionar
             </Button>
@@ -237,11 +237,12 @@ export function LessonEditor({ lesson }: { lesson: LessonEditorData }) {
       </Card>
 
       <MaterialDialog
-        open={materialOpen}
-        onClose={() => setMaterialOpen(false)}
+        key={materialOpen}
+        open={materialOpen > 0}
+        onClose={() => setMaterialOpen(0)}
         lessonId={lesson.id}
         onSaved={() => {
-          setMaterialOpen(false);
+          setMaterialOpen(0);
           router.refresh();
         }}
       />
@@ -289,12 +290,10 @@ export function MaterialDialog({
   const [type, setType] = React.useState<'FILE' | 'LINK'>('FILE');
   const [media, setMedia] = React.useState<{ id: string; name: string; size: number } | null>(null);
 
+  // O estado interno é descartado pelo `key` que o pai troca a cada abertura —
+  // por isso o efeito só precisa avisar que salvou.
   React.useEffect(() => {
-    if (state.ok) {
-      setMedia(null);
-      setType('FILE');
-      onSaved();
-    }
+    if (state.ok) onSaved();
   }, [state, onSaved]);
 
   return (

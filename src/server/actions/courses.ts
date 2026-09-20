@@ -22,6 +22,31 @@ function flag(formData: FormData, name: string): boolean {
   return formData.get(name) === 'on' || formData.get(name) === 'true';
 }
 
+/**
+ * "199,00", "R$ 199,00" ou "1.299,90" -> centavos. Vazio -> null (sem preço).
+ * Aceita o formato brasileiro: ponto separa milhar, vírgula separa centavos.
+ */
+function priceToCents(value: string): number | null {
+  const normalized = value
+    .replace(/[^\d,.]/g, '')
+    .replace(/\.(?=\d{3}\b)/g, '')
+    .replace(',', '.');
+  if (!normalized) return null;
+  const parsed = Number.parseFloat(normalized);
+  return Number.isFinite(parsed) ? Math.round(parsed * 100) : null;
+}
+
+/** Campo com um item por linha (o que acompanha o curso). */
+function listFrom(formData: FormData, name: string): string[] {
+  const value = formData.get(name);
+  if (typeof value !== 'string') return [];
+  return value
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 10);
+}
+
 function text(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === 'string' ? value : '';
@@ -54,6 +79,11 @@ export async function createCourseAction(
     accessType: text(formData, 'accessType') || 'FREE',
     durationMinutes: text(formData, 'durationMinutes') || null,
     certificateEnabled: flag(formData, 'certificateEnabled'),
+    priceCents: priceToCents(text(formData, 'price')),
+    pixDiscountPercent: text(formData, 'pixDiscountPercent') || 10,
+    maxInstallments: text(formData, 'maxInstallments') || 12,
+    includes: listFrom(formData, 'includes'),
+    isBonus: flag(formData, 'isBonus'),
   });
   if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error) };
 
@@ -72,6 +102,11 @@ export async function createCourseAction(
       accessType: parsed.data.accessType,
       durationMinutes: parsed.data.durationMinutes ?? null,
       certificateEnabled: parsed.data.certificateEnabled,
+      priceCents: parsed.data.priceCents ?? null,
+      pixDiscountPercent: parsed.data.pixDiscountPercent,
+      maxInstallments: parsed.data.maxInstallments,
+      includes: parsed.data.includes,
+      isBonus: parsed.data.isBonus,
       position: (last?.position ?? -1) + 1,
       tutorId: tutor.id,
       status: 'DRAFT',
@@ -102,6 +137,11 @@ export async function updateCourseAction(
     accessType: text(formData, 'accessType') || 'FREE',
     durationMinutes: text(formData, 'durationMinutes') || null,
     certificateEnabled: flag(formData, 'certificateEnabled'),
+    priceCents: priceToCents(text(formData, 'price')),
+    pixDiscountPercent: text(formData, 'pixDiscountPercent') || 10,
+    maxInstallments: text(formData, 'maxInstallments') || 12,
+    includes: listFrom(formData, 'includes'),
+    isBonus: flag(formData, 'isBonus'),
   });
   if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error) };
 
@@ -123,6 +163,11 @@ export async function updateCourseAction(
       accessType: parsed.data.accessType,
       durationMinutes: parsed.data.durationMinutes ?? null,
       certificateEnabled: parsed.data.certificateEnabled,
+      priceCents: parsed.data.priceCents ?? null,
+      pixDiscountPercent: parsed.data.pixDiscountPercent,
+      maxInstallments: parsed.data.maxInstallments,
+      includes: parsed.data.includes,
+      isBonus: parsed.data.isBonus,
     },
     select: { slug: true },
   });

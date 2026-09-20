@@ -22,6 +22,11 @@ export interface CourseFormValues {
   accessType: 'FREE' | 'RESTRICTED';
   durationMinutes: number | null;
   certificateEnabled: boolean;
+  priceCents: number | null;
+  pixDiscountPercent: number;
+  maxInstallments: number;
+  includes: string[];
+  isBonus: boolean;
 }
 
 const LEVELS = [
@@ -31,8 +36,8 @@ const LEVELS = [
 ];
 
 const ACCESS = [
-  { value: 'FREE', label: 'Aberto — qualquer aluno cadastrado pode se matricular' },
-  { value: 'RESTRICTED', label: 'Restrito — só com liberação do tutor' },
+  { value: 'RESTRICTED', label: 'Restrito — liberado por você após o pagamento' },
+  { value: 'FREE', label: 'Aberto — qualquer aluno cadastrado entra sozinho' },
 ];
 
 export function CourseForm({ course }: { course?: CourseFormValues }) {
@@ -46,6 +51,7 @@ export function CourseForm({ course }: { course?: CourseFormValues }) {
   const [certificateEnabled, setCertificateEnabled] = React.useState(
     course?.certificateEnabled ?? true,
   );
+  const [isBonus, setIsBonus] = React.useState(course?.isBonus ?? false);
 
   React.useEffect(() => {
     if (state.ok && state.message) toast.success(state.message);
@@ -59,6 +65,7 @@ export function CourseForm({ course }: { course?: CourseFormValues }) {
         name="certificateEnabled"
         value={certificateEnabled ? 'true' : 'false'}
       />
+      <input type="hidden" name="isBonus" value={isBonus ? 'true' : 'false'} />
 
       {state.message && !state.ok && <Alert tone="danger">{state.message}</Alert>}
 
@@ -149,13 +156,64 @@ export function CourseForm({ course }: { course?: CourseFormValues }) {
       </Card>
 
       <Card>
+        <CardHeader
+          title="Investimento"
+          description="O pagamento é combinado com você (PIX ou cartão). O aluno registra o pedido e você libera o acesso em Solicitações."
+        />
+        <div className="flex flex-col gap-5 p-5">
+          <div className="grid gap-5 sm:grid-cols-3">
+            <Input
+              label="Preço (R$)"
+              name="price"
+              inputMode="decimal"
+              defaultValue={course?.priceCents ? (course.priceCents / 100).toFixed(2).replace('.', ',') : ''}
+              error={state.errors?.priceCents}
+              hint="Em branco: sem preço."
+              placeholder="199,00"
+            />
+            <Input
+              label="Desconto no PIX (%)"
+              name="pixDiscountPercent"
+              type="number"
+              min={0}
+              max={90}
+              defaultValue={course?.pixDiscountPercent ?? 10}
+            />
+            <Input
+              label="Parcelas no cartão"
+              name="maxInstallments"
+              type="number"
+              min={1}
+              max={24}
+              defaultValue={course?.maxInstallments ?? 12}
+            />
+          </div>
+
+          <Textarea
+            label="O que acompanha o curso"
+            name="includes"
+            rows={4}
+            defaultValue={(course?.includes ?? []).join('\n')}
+            hint="Um item por linha. Ex.: Apostila completa / Certificado de conclusão / Interação direta com o tutor"
+          />
+
+          <Switch
+            label="Curso bônus"
+            description="Bônus não é vendido: é liberado de brinde. O preço é ignorado e o cartão mostra o selo de bônus."
+            checked={isBonus}
+            onCheckedChange={setIsBonus}
+          />
+        </div>
+      </Card>
+
+      <Card>
         <CardHeader title="Acesso e certificado" />
         <div className="flex flex-col gap-5 p-5">
           <Select
             label="Quem pode acessar"
             name="accessType"
             options={ACCESS}
-            defaultValue={course?.accessType ?? 'FREE'}
+            defaultValue={course?.accessType ?? 'RESTRICTED'}
           />
           <Switch
             label="Emitir certificado ao concluir"

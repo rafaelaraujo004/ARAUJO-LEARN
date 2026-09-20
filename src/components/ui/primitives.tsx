@@ -287,7 +287,6 @@ export function Avatar({
       aria-hidden
     >
       {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt="" className="size-full object-cover" loading="lazy" />
       ) : (
         letters || '?'

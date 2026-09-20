@@ -1,9 +1,9 @@
 /**
- * Dados iniciais.
+ * Dados iniciais da ARAÚJO LEARN.
  *
- * Cria o tutor/administrador e um conjunto de CONTEÚDO DE DEMONSTRAÇÃO,
- * claramente identificável, para que a plataforma possa ser vista funcionando
- * antes de existir conteúdo real. Tudo pode ser editado ou apagado pelo painel.
+ * Cria o tutor (Eng. Civil Amilton Araújo) e os cursos reais da plataforma,
+ * com a estrutura de módulos e aulas já montada. Os textos de aula são uma
+ * base de partida — tudo é editável pelo painel, sem tocar em código.
  *
  * É idempotente: rodar de novo não duplica nada.
  *
@@ -33,10 +33,17 @@ function hashPassword(password: string): Promise<string> {
   });
 }
 
-const TUTOR_EMAIL = process.env.SEED_TUTOR_EMAIL ?? 'tutor@araujolearn.com';
+const TUTOR_EMAIL = process.env.SEED_TUTOR_EMAIL ?? 'amilton@araujolearn.com';
 const TUTOR_PASSWORD = process.env.SEED_TUTOR_PASSWORD ?? 'araujo2024';
 const STUDENT_EMAIL = process.env.SEED_STUDENT_EMAIL ?? 'aluno@araujolearn.com';
 const STUDENT_PASSWORD = process.env.SEED_STUDENT_PASSWORD ?? 'aluno2024';
+
+/** Slugs do conteúdo de demonstração da primeira versão — removidos se existirem. */
+const LEGACY_SLUGS = [
+  'excel-do-zero-ao-profissional',
+  'power-bi-na-pratica',
+  'apresentacoes-que-convencem',
+];
 
 interface LessonSeed {
   title: string;
@@ -60,181 +67,328 @@ interface CourseSeed {
   objective: string;
   audience: string;
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  status: 'DRAFT' | 'PUBLISHED';
+  durationMinutes: number;
+  priceCents: number | null;
+  includes: string[];
+  isBonus?: boolean;
+  unlocksWith?: string[];
   modules: ModuleSeed[];
 }
 
 const COURSES: CourseSeed[] = [
   {
-    slug: 'excel-do-zero-ao-profissional',
-    title: 'Excel do Zero ao Profissional',
+    slug: 'leitura-e-interpretacao-de-projetos-de-engenharia',
+    title: 'Leitura e Interpretação de Projetos de Engenharia',
     shortDescription:
-      'Saia do zero e chegue às funções que o mercado realmente cobra: organização de dados, fórmulas, tabelas dinâmicas e relatórios.',
+      'Aprenda a ler qualquer prancha com segurança: arquitetura, estrutura e complementares, da escala ao canteiro de obras.',
     description:
-      'Um caminho completo e sem atalhos furados. Você começa entendendo a lógica da planilha, passa pelas fórmulas que resolvem 90% dos problemas do dia a dia e termina montando um relatório que se atualiza sozinho.\n\nCada módulo termina com uma tarefa prática. Nada de decorar botão: o objetivo é você conseguir resolver um problema novo sozinho.',
+      'Projeto mal lido vira retrabalho, prejuízo e discussão no canteiro. Este curso ataca exatamente isso: você aprende a percorrer um projeto completo — arquitetônico, estrutural e complementares — entendendo o que cada linha, cota e símbolo está comunicando.\n\nO curso é conduzido diretamente pelo Eng. Amilton Araújo, com acompanhamento durante toda a formação. Você pode tirar dúvidas sobre os projetos que estiver enfrentando no seu trabalho, e não apenas sobre os exemplos das aulas.\n\nAo final, você não sai "sabendo um pouco": sai capaz de pegar um projeto que nunca viu, entender a intenção do projetista, identificar incompatibilidades e extrair o que precisa para orçar e executar.',
     objective:
-      'Ao final, você será capaz de organizar qualquer base de dados, construir fórmulas confiáveis e entregar relatórios claros com tabelas dinâmicas e gráficos.',
+      'Ler e interpretar, com autonomia, projetos arquitetônicos, estruturais e complementares — identificando escalas, cotas, simbologia, incompatibilidades e as informações necessárias para executar e orçar a obra.',
     audience:
-      'Quem usa Excel no trabalho e sente que só arranha a superfície, e quem nunca abriu uma planilha e quer começar do jeito certo.',
+      'Engenheiros e arquitetos em início de carreira, técnicos em edificações, estudantes, mestres de obra, encarregados e profissionais de orçamento que precisam entender projeto sem depender de terceiros.',
     level: 'BEGINNER',
-    status: 'PUBLISHED',
+    durationMinutes: 480,
+    priceCents: 19_900,
+    includes: [
+      'Apostila completa',
+      'Certificado de conclusão',
+      'Interação direta com o tutor',
+      'Acesso permanente ao conteúdo',
+    ],
     modules: [
       {
-        title: 'Primeiros passos',
-        description: 'A lógica da planilha antes de qualquer fórmula.',
+        title: 'Fundamentos do desenho técnico',
+        description: 'A linguagem antes do projeto: normas, escalas e simbologia.',
         lessons: [
           {
-            title: 'Como o Excel pensa',
-            description: 'Células, referências e por que tudo depende disso.',
-            minutes: 9,
+            title: 'Como um projeto se comunica',
+            description: 'O que o desenho técnico é — e o que ele nunca diz explicitamente.',
+            minutes: 25,
             preview: true,
             content:
-              '## O que você vai entender aqui\n\nAntes de qualquer fórmula, é preciso entender **como o Excel enxerga uma planilha**. Tudo se resume a três ideias:\n\n1. Toda informação mora em uma **célula**.\n2. Toda célula tem um **endereço** (A1, B7, C12).\n3. Fórmulas não guardam números: elas guardam **caminhos até os números**.\n\n> Quem entende isso para de errar referência. Quem não entende passa a vida arrastando fórmula e torcendo.\n\n### Exercício rápido\n\nAbra uma planilha em branco e escreva seu nome em `A1`. Em `B1`, escreva `=A1`. Agora mude o que está em `A1` e observe o que acontece com `B1`.',
+              '## Projeto é linguagem, não desenho\n\nUm projeto de engenharia não é uma ilustração da obra: é um **documento técnico** que comunica decisões. Toda linha tem intenção, e quase nada está ali por estética.\n\nTrês perguntas guiam a leitura de qualquer prancha:\n\n1. **O que estou vendo?** — planta, corte, vista, detalhe.\n2. **De onde estou olhando?** — o plano de corte e o sentido de observação mudam tudo.\n3. **Em que escala?** — a mesma parede pode ser um traço ou um detalhe construtivo completo.\n\n> Quem pula a pergunta 2 interpreta corte como fachada. É o erro mais comum de quem está começando — e o mais caro.\n\n### O que o projeto NÃO diz\n\nO projeto entrega geometria e especificação. Ele não entrega **sequência executiva**, **produtividade** nem **custo**. Essas informações você constrói a partir da leitura — e é isso que este curso ensina.',
           },
           {
-            title: 'Organizando dados do jeito certo',
-            description: 'A regra de ouro: uma informação por coluna, um registro por linha.',
-            minutes: 12,
+            title: 'Normas e convenções: NBR 6492 e NBR 8196',
+            description: 'Espessuras de linha, tipos de traço e o que cada convenção significa.',
+            minutes: 30,
+          },
+          {
+            title: 'Escalas: ler, converter e desconfiar',
+            description: 'Escala gráfica, escala numérica e o cuidado com pranchas impressas.',
+            minutes: 28,
             content:
-              '## Uma informação por coluna\n\nA maior parte dos problemas com planilhas nasce aqui: misturar informações na mesma célula.\n\n- **Errado:** `João Silva - 11/03/2024 - R$ 1.200`\n- **Certo:** três colunas separadas — Nome, Data, Valor\n\nQuando os dados estão organizados assim, tudo o mais fica fácil: filtro, ordenação, tabela dinâmica e gráfico.',
+              '## A escala é um contrato\n\nQuando a prancha informa **1:50**, cada centímetro no papel representa 50 cm na obra. Parece óbvio, mas dois detalhes derrubam muita gente:\n\n- **Impressão fora de escala.** Uma prancha A1 impressa em A3 mantém a proporção, mas não a medida absoluta. Por isso existe a **escala gráfica**: ela encolhe junto com o desenho.\n- **Escalas diferentes na mesma prancha.** É normal a planta estar em 1:50 e o detalhe de fundação em 1:20. Confira o selo de cada desenho, não o da prancha.\n\n### Regra prática\n\n**Nunca meça com régua para tomar decisão de obra.** Use a cota. A régua serve para conferir se a cota faz sentido — não para substituí-la.',
           },
           {
-            title: 'Formatação que comunica',
-            description: 'Deixar bonito é consequência de deixar claro.',
-            minutes: 11,
+            title: 'Cotas, níveis e amarrações',
+            description: 'Cota acumulada, cota parcial, referência de nível e eixos.',
+            minutes: 32,
           },
         ],
       },
       {
-        title: 'Fórmulas que resolvem',
-        description: 'As funções que aparecem em praticamente todo trabalho real.',
+        title: 'Projeto arquitetônico',
+        description: 'Percorrendo o projeto do todo ao detalhe.',
         lessons: [
           {
-            title: 'SOMA, MÉDIA, MÁXIMO e MÍNIMO',
-            description: 'O básico bem feito resolve mais do que parece.',
-            minutes: 14,
+            title: 'Planta baixa: leitura ambiente por ambiente',
+            description: 'Paredes, vãos, esquadrias, e o que cada hachura representa.',
+            minutes: 35,
           },
           {
-            title: 'SE: a fórmula que toma decisões',
-            description: 'Condições, valores verdadeiros e falsos, e SEs encadeados.',
-            minutes: 18,
-            content:
-              '## A estrutura do SE\n\n```\n=SE(condição; valor se verdadeiro; valor se falso)\n```\n\nLeia sempre em voz alta: *"Se isso for verdade, faça aquilo; senão, faça outra coisa."*\n\n### Cuidado com o encadeamento\n\nSEs dentro de SEs funcionam, mas depois do terceiro nível a fórmula vira um labirinto. Quando chegar nesse ponto, o problema geralmente é outro: falta uma tabela de apoio.',
+            title: 'Cortes e fachadas',
+            description: 'Pés-direitos, escadas, forros e a relação entre os desenhos.',
+            minutes: 30,
           },
           {
-            title: 'PROCV e PROCX na prática',
-            description: 'Buscar informação em outra tabela sem errar.',
-            minutes: 21,
+            title: 'Implantação, locação e planta de cobertura',
+            description: 'Situar a obra no terreno sem erro de locação.',
+            minutes: 28,
+          },
+          {
+            title: 'Quadro de esquadrias e de áreas',
+            description: 'As tabelas que resumem o projeto — e que quase ninguém lê.',
+            minutes: 22,
           },
         ],
       },
       {
-        title: 'Relatórios e apresentação',
-        description: 'Transformar dados em decisão.',
+        title: 'Projetos complementares',
+        description: 'Estrutura, elétrica e hidrossanitário: lendo o conjunto.',
         lessons: [
           {
-            title: 'Tabelas dinâmicas do zero',
-            description: 'Resumir milhares de linhas em segundos.',
-            minutes: 19,
+            title: 'Estrutural: fôrmas, armação e locação de pilares',
+            description: 'Da planta de fôrmas ao detalhamento das armaduras.',
+            minutes: 38,
           },
           {
-            title: 'Gráficos que não mentem',
-            description: 'Escolher o gráfico certo para cada pergunta.',
-            minutes: 15,
+            title: 'Elétrico: pontos, circuitos e quadro de cargas',
+            description: 'Leitura da simbologia elétrica aplicada à execução.',
+            minutes: 30,
           },
           {
-            title: 'Montando um relatório que se atualiza sozinho',
-            description: 'Juntando tudo em um entregável profissional.',
+            title: 'Hidrossanitário: água fria, esgoto e pluvial',
+            description: 'Prumadas, isométricos e caimentos.',
+            minutes: 32,
+          },
+          {
+            title: 'Compatibilização: achar o conflito antes do concreto',
+            description: 'Sobrepondo projetos para encontrar interferências.',
+            minutes: 35,
+          },
+        ],
+      },
+      {
+        title: 'Da prancha para o canteiro',
+        description: 'Transformar leitura em decisão de execução.',
+        lessons: [
+          {
+            title: 'Extraindo quantitativos do projeto',
+            description: 'O primeiro passo de todo orçamento nasce aqui.',
+            minutes: 33,
+          },
+          {
+            title: 'Checklist de leitura de um projeto completo',
+            description: 'Um roteiro para não deixar nada passar.',
             minutes: 24,
+            content:
+              '## Roteiro de leitura\n\nUse esta ordem sempre que receber um projeto novo. Ela evita que você tome decisões com informação pela metade.\n\n1. **Selo e revisão** — você está com a versão mais recente?\n2. **Lista de pranchas** — o conjunto está completo?\n3. **Implantação e locação** — onde a obra fica no terreno.\n4. **Plantas baixas** — organização e fluxos.\n5. **Cortes** — alturas, níveis e escadas.\n6. **Estrutural** — pilares, vigas e fundação.\n7. **Complementares** — elétrica e hidrossanitário.\n8. **Compatibilização** — o que conflita entre as disciplinas.\n9. **Quadros e memoriais** — especificações e acabamentos.\n\n> Anote toda dúvida enquanto lê. Dúvida anotada vira pergunta ao projetista; dúvida esquecida vira retrabalho na obra.',
           },
         ],
       },
     ],
   },
   {
-    slug: 'power-bi-na-pratica',
-    title: 'Power BI na Prática',
+    slug: 'orcamento-preliminar-de-obras-civis',
+    title: 'Orçamento Preliminar de Obras Civis',
     shortDescription:
-      'Do arquivo bruto ao painel publicado: modelagem, relacionamentos, DAX essencial e visuais que respondem perguntas de negócio.',
+      'Monte orçamentos confiáveis do zero: quantitativos, composições, BDI, curva ABC e cronograma físico-financeiro.',
     description:
-      'Curso direto ao ponto para quem já mexe com dados e precisa entregar painéis. Começamos pela parte que ninguém gosta — e que decide tudo: o tratamento dos dados. Depois modelagem, medidas e, por fim, o painel.',
+      'Orçamento errado não aparece no dia em que é feito — aparece seis meses depois, quando o dinheiro acaba. Este curso ensina o método completo do orçamento preliminar de obras civis, do levantamento de quantitativos à planilha final apresentada ao cliente.\n\nVocê aprende a usar as fontes oficiais de preço (SINAPI e similares), a montar composições de custo, a calcular o BDI sem inventar percentual e a construir a curva ABC para saber onde o orçamento realmente se decide.\n\nO acompanhamento é direto com o Eng. Amilton Araújo, que atua com perícia e avaliação de engenharia — ou seja, com quem vê na prática o que acontece quando um orçamento é feito sem critério.',
     objective:
-      'Construir um painel completo, do zero, com dados tratados, modelo bem relacionado e medidas confiáveis.',
-    audience: 'Analistas, administradores e qualquer pessoa que precise apresentar dados.',
+      'Elaborar um orçamento preliminar completo de uma obra civil: levantar quantitativos a partir do projeto, compor custos unitários, aplicar BDI, montar a planilha orçamentária, a curva ABC e o cronograma físico-financeiro.',
+    audience:
+      'Engenheiros, arquitetos, técnicos em edificações, orçamentistas iniciantes e profissionais que precisam apresentar propostas de obra com segurança técnica.',
     level: 'INTERMEDIATE',
-    status: 'PUBLISHED',
+    durationMinutes: 720,
+    priceCents: 24_900,
+    includes: [
+      'Material complementar',
+      'Certificado de conclusão',
+      'Interação direta com o tutor',
+      'Acesso permanente ao conteúdo',
+    ],
     modules: [
       {
-        title: 'Preparando os dados',
-        description: 'Power Query: onde 70% do trabalho realmente acontece.',
+        title: 'Fundamentos do orçamento',
+        description: 'O que é, para que serve e até onde vai um orçamento preliminar.',
         lessons: [
           {
-            title: 'Importando e limpando',
-            description: 'Tipos, colunas inúteis e erros silenciosos.',
-            minutes: 16,
+            title: 'Estimativo, preliminar e analítico: qual usar quando',
+            description: 'Precisão exigida, tempo disponível e risco assumido.',
+            minutes: 30,
             preview: true,
+            content:
+              '## Três níveis, três finalidades\n\n| Tipo | Base | Margem típica | Quando usar |\n|---|---|---|---|\n| Estimativo | Custo por m² (CUB) | ±30% | Viabilidade inicial |\n| Preliminar | Quantitativos principais + composições | ±15% | Proposta e planejamento |\n| Analítico | Todos os serviços detalhados | ±5% | Contratação e execução |\n\nO erro mais comum é **vender precisão que o método não entrega**. Um orçamento preliminar apresentado como se fosse analítico é um problema esperando para acontecer.\n\n> Deixe sempre explícito na sua proposta qual é o nível do orçamento e qual a margem esperada. Isso protege você e informa o cliente.',
           },
           {
-            title: 'Transformações que você vai usar sempre',
-            description: 'Mesclar, anexar, dividir e pivotar.',
-            minutes: 20,
-          },
-        ],
-      },
-      {
-        title: 'Modelo e medidas',
-        description: 'Relacionamentos corretos e DAX sem mistério.',
-        lessons: [
-          {
-            title: 'Relacionamentos e cardinalidade',
-            description: 'Por que o total bate errado quando o modelo está errado.',
-            minutes: 18,
+            title: 'Fontes de preço: SINAPI, SICRO e cotação de mercado',
+            description: 'Como consultar, quando confiar e como ajustar à sua região.',
+            minutes: 35,
           },
           {
-            title: 'DAX essencial: as 8 funções que bastam no começo',
-            description: 'CALCULATE, SUM, DIVIDE e companhia.',
+            title: 'Custo x preço: a diferença que define o lucro',
+            description: 'Onde termina o custo e começa a sua margem.',
             minutes: 25,
           },
         ],
       },
       {
-        title: 'O painel',
-        description: 'Visual, narrativa e publicação.',
+        title: 'Levantamento de quantitativos',
+        description: 'Do projeto para a planilha, serviço por serviço.',
         lessons: [
           {
-            title: 'Escolhendo visuais com propósito',
-            description: 'Cada gráfico responde a uma pergunta específica.',
-            minutes: 17,
+            title: 'Serviços preliminares e movimento de terra',
+            description: 'Canteiro, limpeza, escavação, aterro e transporte.',
+            minutes: 32,
           },
           {
-            title: 'Publicando e compartilhando',
-            description: 'Do desktop ao serviço, com segurança.',
-            minutes: 13,
+            title: 'Fundações e estrutura',
+            description: 'Concreto, fôrma e aço: as três contas que sustentam o orçamento.',
+            minutes: 40,
+          },
+          {
+            title: 'Alvenaria, revestimentos e cobertura',
+            description: 'Áreas, descontos de vãos e perdas.',
+            minutes: 38,
+          },
+          {
+            title: 'Instalações e acabamentos',
+            description: 'Pontos, metragens e o peso dos acabamentos no total.',
+            minutes: 35,
+          },
+        ],
+      },
+      {
+        title: 'Composição de custos',
+        description: 'O que forma o preço de cada serviço.',
+        lessons: [
+          {
+            title: 'Custos diretos: material, mão de obra e equipamento',
+            description: 'Montando uma composição do zero.',
+            minutes: 40,
+          },
+          {
+            title: 'Encargos sociais e complementares',
+            description: 'Desonerado x não desonerado, e o impacto real na planilha.',
+            minutes: 35,
+          },
+          {
+            title: 'BDI: o que entra, o que não entra e como calcular',
+            description: 'Administração central, risco, lucro e tributos.',
+            minutes: 45,
+            content:
+              '## BDI não é "um número que se usa"\n\nBDI (Benefícios e Despesas Indiretas) é **calculado**, não escolhido. A fórmula consolidada pelo Acórdão TCU 2622/2013 é a referência mais usada:\n\n```\nBDI = [ (1+AC+S+R+G) × (1+DF) × (1+L) ] / (1 - I) - 1\n```\n\nOnde:\n\n- **AC** — administração central\n- **S** — seguros\n- **R** — riscos\n- **G** — garantias\n- **DF** — despesas financeiras\n- **L** — lucro\n- **I** — tributos sobre o faturamento\n\n### O erro clássico\n\nIncluir no BDI um custo que já está na composição — ou o contrário. **Administração local de obra é custo direto**, não BDI. Contar duas vezes infla o preço e derruba a proposta; não contar nenhuma vez come o lucro.',
+          },
+        ],
+      },
+      {
+        title: 'Montando e apresentando o orçamento',
+        description: 'A planilha, a curva ABC e o cronograma.',
+        lessons: [
+          {
+            title: 'Planilha orçamentária: estrutura e organização',
+            description: 'Itens, subitens, unidades e totalizações.',
+            minutes: 35,
+          },
+          {
+            title: 'Curva ABC: onde o orçamento realmente se decide',
+            description: 'Os 20% de serviços que representam 80% do custo.',
+            minutes: 32,
+          },
+          {
+            title: 'Cronograma físico-financeiro',
+            description: 'Distribuindo o orçamento no tempo.',
+            minutes: 38,
+          },
+          {
+            title: 'Apresentando o orçamento ao cliente',
+            description: 'Como defender cada número da sua planilha.',
+            minutes: 30,
           },
         ],
       },
     ],
   },
   {
-    slug: 'apresentacoes-que-convencem',
-    title: 'Apresentações que Convencem',
+    slug: 'legislacao-de-obra-e-sistema-crea',
+    title: 'Legislação de Obra e Sistema CREA',
     shortDescription:
-      'Estrutura, roteiro e slides que sustentam uma ideia — para reuniões, defesas e propostas.',
+      'Responsabilidade técnica, ART, atribuições profissionais e licenciamento — o que todo profissional de obra precisa saber para não se expor.',
     description:
-      'Curso em preparação. A estrutura está montada e as aulas serão publicadas em breve.',
-    objective: 'Montar e conduzir uma apresentação que leve a uma decisão.',
-    audience: 'Quem precisa defender ideias, projetos ou resultados.',
+      'Curso bônus, liberado automaticamente para quem adquire os dois cursos da formação.\n\nBoa parte dos problemas graves em obra não é técnica: é de responsabilidade. Quem assina o quê, qual atribuição cada profissional tem, quando a ART é obrigatória e o que acontece quando ela não existe.\n\nConteúdo conduzido pelo Eng. Amilton Araújo, com a perspectiva de quem atua em perícia e avaliação de engenharia.',
+    objective:
+      'Entender o Sistema CONFEA/CREA, emitir e interpretar ART corretamente, conhecer as atribuições profissionais e as obrigações legais que cercam uma obra.',
+    audience:
+      'Todo profissional que assina, executa, fiscaliza ou orça obra — e precisa saber exatamente o tamanho da responsabilidade que está assumindo.',
     level: 'BEGINNER',
-    status: 'DRAFT',
+    durationMinutes: 240,
+    priceCents: null,
+    isBonus: true,
+    unlocksWith: [
+      'leitura-e-interpretacao-de-projetos-de-engenharia',
+      'orcamento-preliminar-de-obras-civis',
+    ],
+    includes: ['Certificado de conclusão', 'Interação direta com o tutor'],
     modules: [
       {
-        title: 'Antes do slide',
-        description: 'Objetivo, público e a única mensagem que importa.',
+        title: 'Responsabilidade técnica',
+        description: 'O Sistema CONFEA/CREA e o que ele cobra de você.',
         lessons: [
           {
-            title: 'Qual decisão você quer provocar?',
-            description: 'A pergunta que define toda a apresentação.',
-            minutes: 10,
+            title: 'Sistema CONFEA/CREA: como funciona na prática',
+            description: 'Registro, anuidade, fiscalização e o papel de cada instância.',
+            minutes: 30,
+          },
+          {
+            title: 'ART: quando, como e por quê',
+            description: 'Tipos de ART, prazo de registro e consequências da ausência.',
+            minutes: 35,
+            content:
+              '## A ART não é burocracia\n\nA Anotação de Responsabilidade Técnica é o documento que **vincula um profissional a um serviço técnico**. Sem ela, do ponto de vista do CREA, o serviço não tem responsável — e quem executou está em exercício irregular.\n\n### Pontos que geram mais dúvida\n\n- **Prazo:** a ART deve ser registrada **antes** do início da atividade.\n- **Alteração x baixa:** mudou escopo, registra aditivo; terminou, dá baixa.\n- **Obra com vários profissionais:** cada um registra a ART da sua parte. Não existe "ART que cobre todo mundo".\n\n> A ART também é o que alimenta o seu **acervo técnico**. Profissional que não registra ART chega na hora de provar experiência sem nada na mão.',
+          },
+          {
+            title: 'Atribuições profissionais: o que você pode assinar',
+            description: 'Resolução 218 e o limite de cada formação.',
+            minutes: 32,
+          },
+          {
+            title: 'Acervo técnico e CAT',
+            description: 'Construindo a prova da sua experiência ao longo da carreira.',
+            minutes: 25,
+          },
+        ],
+      },
+      {
+        title: 'Licenciamento e obrigações da obra',
+        description: 'Do alvará ao habite-se.',
+        lessons: [
+          {
+            title: 'Alvarás, licenças e habite-se',
+            description: 'A sequência de documentos de uma obra regular.',
+            minutes: 30,
+          },
+          {
+            title: 'Responsabilidade civil e criminal na obra',
+            description: 'Prazos de responsabilidade e o que diz o Código Civil.',
+            minutes: 32,
+          },
+          {
+            title: 'Fiscalização: como se preparar',
+            description: 'Documentos no canteiro e postura na visita do fiscal.',
+            minutes: 26,
           },
         ],
       },
@@ -255,62 +409,100 @@ function slugify(input: string): string {
 async function main() {
   console.log('[seed] iniciando…');
 
+  // Remove o conteúdo de demonstração da primeira versão, se ainda existir.
+  const removed = await db.course.deleteMany({ where: { slug: { in: LEGACY_SLUGS } } });
+  if (removed.count > 0) {
+    console.log(`[seed] ${removed.count} curso(s) de demonstração removido(s).`);
+  }
+  await db.user.deleteMany({ where: { email: 'tutor@araujolearn.com' } });
+
   // ------------------------------------------------------------- Tutor
+  const bio =
+    'Engenheiro Civil, mestre em Perícia e Avaliação de Engenharia e MBA em Gestão de Projetos. ' +
+    'Ensino a partir do que a prática cobra: leitura de projeto, orçamento e responsabilidade técnica. ' +
+    'Minha régua é simples — a aula só presta se você conseguir aplicar na sua obra no dia seguinte.';
+
   const tutor = await db.user.upsert({
     where: { email: TUTOR_EMAIL },
-    update: { role: 'ADMIN' },
+    update: { role: 'ADMIN', name: 'Eng. Amilton Araújo', headline: 'Engenheiro Civil · MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de Projetos', bio },
     create: {
-      name: 'Rafael Araújo',
+      name: 'Eng. Amilton Araújo',
       email: TUTOR_EMAIL,
       passwordHash: await hashPassword(TUTOR_PASSWORD),
       role: 'ADMIN',
-      headline: 'Tutor e criador da ARAÚJO LEARN',
-      bio: 'Ensino tecnologia aplicada ao trabalho de verdade: planilhas, dados e produtividade. Minha régua é simples — a aula só presta se você conseguir aplicar no dia seguinte.',
+      headline:
+        'Engenheiro Civil · MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de Projetos',
+      bio,
     },
   });
+
+  const tutorProfile = {
+    isPrimary: true,
+    headline:
+      'Engenheiro Civil · MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de Projetos',
+    bio,
+    experience:
+      'Mestre (MSc) em Perícia e Avaliação de Engenharia e MBA em Gestão de Projetos. ' +
+      'Atuação em projetos, orçamento, perícia e avaliação de obras civis, além de formação de ' +
+      'profissionais e equipes técnicas.',
+    methodology:
+      'Aula direta, exemplo real de obra e aplicação imediata. Cada módulo termina com uma tarefa ' +
+      'prática, e o aluno tem canal aberto com o tutor durante toda a formação — inclusive para ' +
+      'levar dúvidas dos próprios projetos e orçamentos que está enfrentando no trabalho.',
+    specialties: [
+      'Leitura de projetos',
+      'Orçamento de obras',
+      'Perícia e avaliação',
+      'Gestão de projetos',
+      'Legislação e CREA',
+    ],
+    socials: { whatsapp: '(94) 99190-6608', instagram: '', linkedin: '', site: '' },
+  };
 
   await db.tutorProfile.upsert({
     where: { userId: tutor.id },
-    update: { isPrimary: true },
-    create: {
-      userId: tutor.id,
-      isPrimary: true,
-      headline: 'Tutor e criador da ARAÚJO LEARN',
-      bio: 'Ensino tecnologia aplicada ao trabalho de verdade: planilhas, dados e produtividade. Minha régua é simples — a aula só presta se você conseguir aplicar no dia seguinte.',
-      experience:
-        'Mais de uma década trabalhando com dados e formação de equipes. Já treinei times comerciais, financeiros e operacionais, sempre com o mesmo foco: transformar ferramenta em resultado.',
-      methodology:
-        'Aula curta, exemplo real e tarefa prática. Nenhum módulo termina sem que você tenha feito algo com as próprias mãos.',
-      specialties: ['Excel', 'Power BI', 'Análise de dados', 'Produtividade', 'Comunicação'],
-      socials: { instagram: '', linkedin: '', youtube: '', site: '' },
-    },
+    update: tutorProfile,
+    create: { userId: tutor.id, ...tutorProfile },
   });
 
   // ------------------------------------------------------------ Cursos
+  const bySlug = new Map<string, string>();
+
   for (const [courseIndex, seed] of COURSES.entries()) {
+    const data = {
+      title: seed.title,
+      shortDescription: seed.shortDescription,
+      description: seed.description,
+      objective: seed.objective,
+      audience: seed.audience,
+      level: seed.level,
+      durationMinutes: seed.durationMinutes,
+      priceCents: seed.priceCents,
+      includes: seed.includes,
+      isBonus: seed.isBonus ?? false,
+      // Cursos pagos: acesso liberado pelo tutor após a confirmação do pagamento.
+      accessType: 'RESTRICTED' as const,
+      certificateEnabled: true,
+      position: courseIndex,
+      tutorId: tutor.id,
+    };
+
     const course = await db.course.upsert({
       where: { slug: seed.slug },
-      update: {},
+      update: data,
       create: {
+        ...data,
         slug: seed.slug,
-        title: seed.title,
-        shortDescription: seed.shortDescription,
-        description: seed.description,
-        objective: seed.objective,
-        audience: seed.audience,
-        level: seed.level,
-        status: seed.status,
-        accessType: 'FREE',
-        certificateEnabled: true,
-        position: courseIndex,
-        tutorId: tutor.id,
-        publishedAt: seed.status === 'PUBLISHED' ? new Date() : null,
+        status: 'PUBLISHED',
+        publishedAt: new Date(),
       },
+      select: { id: true, title: true },
     });
+    bySlug.set(seed.slug, course.id);
 
     const existingModules = await db.module.count({ where: { courseId: course.id } });
     if (existingModules > 0) {
-      console.log(`[seed] curso "${seed.title}" já tem módulos — mantido como está.`);
+      console.log(`[seed] "${seed.title}" já tem módulos — estrutura preservada.`);
       continue;
     }
 
@@ -341,24 +533,44 @@ async function main() {
       }
     }
 
-    console.log(`[seed] curso "${seed.title}" criado com ${seed.modules.length} módulos.`);
+    const lessonTotal = seed.modules.reduce((total, m) => total + m.lessons.length, 0);
+    console.log(
+      `[seed] "${seed.title}" — ${seed.modules.length} módulos, ${lessonTotal} aulas.`,
+    );
+  }
+
+  // Liga o curso bônus aos cursos que o desbloqueiam.
+  for (const seed of COURSES) {
+    if (!seed.unlocksWith?.length) continue;
+    const courseId = bySlug.get(seed.slug);
+    const requiredIds = seed.unlocksWith
+      .map((slug) => bySlug.get(slug))
+      .filter((value): value is string => Boolean(value));
+    if (courseId && requiredIds.length > 0) {
+      await db.course.update({
+        where: { id: courseId },
+        data: { unlocksWithCourseIds: requiredIds },
+      });
+      console.log(`[seed] bônus "${seed.title}" ligado a ${requiredIds.length} cursos.`);
+    }
   }
 
   // -------------------------------------------------------- Atividade
-  const excel = await db.course.findUnique({
-    where: { slug: 'excel-do-zero-ao-profissional' },
-    select: { id: true, modules: { orderBy: { position: 'asc' }, select: { id: true } } },
-  });
+  const leituraId = bySlug.get('leitura-e-interpretacao-de-projetos-de-engenharia');
+  if (leituraId && (await db.activity.count({ where: { courseId: leituraId } })) === 0) {
+    const firstModule = await db.module.findFirst({
+      where: { courseId: leituraId },
+      orderBy: { position: 'asc' },
+      select: { id: true },
+    });
 
-  if (excel && (await db.activity.count({ where: { courseId: excel.id } })) === 0) {
-    const firstModule = excel.modules[0];
     const activity = await db.activity.create({
       data: {
-        courseId: excel.id,
+        courseId: leituraId,
         moduleId: firstModule?.id ?? null,
-        title: 'Checkpoint: a lógica da planilha',
+        title: 'Checkpoint: fundamentos do desenho técnico',
         description:
-          'Três perguntas rápidas para confirmar que a base está firme antes de seguir para as fórmulas.',
+          'Três perguntas rápidas para confirmar que a base está firme antes de entrar no projeto arquitetônico.',
         type: 'QUIZ',
         isRequired: true,
         passingScore: 70,
@@ -368,36 +580,41 @@ async function main() {
 
     const questions = [
       {
-        prompt: 'O que uma fórmula como `=A1` realmente guarda?',
+        prompt:
+          'Uma prancha originalmente em A1 na escala 1:50 foi impressa em A3. O que acontece com as medidas?',
         type: 'SINGLE_CHOICE' as const,
         explanation:
-          'A fórmula guarda o endereço. Por isso, quando o conteúdo de A1 muda, o resultado muda junto.',
+          'A proporção se mantém, mas a escala numérica impressa deixa de valer. Por isso a escala gráfica existe: ela reduz junto com o desenho.',
         options: [
-          { text: 'Uma cópia do valor que estava em A1 no momento em que foi digitada', isCorrect: false },
-          { text: 'O endereço da célula A1, e busca o valor sempre que a planilha recalcula', isCorrect: true },
-          { text: 'Um texto fixo com o nome da célula', isCorrect: false },
+          { text: 'Nada muda: a escala 1:50 continua válida com régua', isCorrect: false },
+          {
+            text: 'A proporção se mantém, mas a escala numérica não vale mais — use a escala gráfica ou a cota',
+            isCorrect: true,
+          },
+          { text: 'O desenho fica distorcido e não pode ser usado', isCorrect: false },
         ],
       },
       {
-        prompt: 'Qual destas organizações segue a regra "uma informação por coluna"?',
+        prompt: 'Qual informação deve prevalecer para uma decisão de execução em obra?',
         type: 'SINGLE_CHOICE' as const,
         explanation:
-          'Separar nome, data e valor em colunas próprias é o que permite filtrar, ordenar e resumir depois.',
+          'A cota é a informação oficial do projeto. A medição com régua serve apenas para conferência de coerência.',
         options: [
-          { text: 'Uma coluna com "João Silva - 11/03/2024 - R$ 1.200"', isCorrect: false },
-          { text: 'Três colunas: Nome, Data e Valor', isCorrect: true },
-          { text: 'Uma coluna por cliente, com todos os dados empilhados', isCorrect: false },
+          { text: 'A medida obtida com régua sobre a prancha', isCorrect: false },
+          { text: 'A cota indicada no desenho', isCorrect: true },
+          { text: 'A estimativa do encarregado no canteiro', isCorrect: false },
         ],
       },
       {
-        prompt: 'Selecione tudo o que fica mais fácil quando os dados estão bem organizados.',
+        prompt: 'Selecione tudo o que o projeto NÃO informa diretamente.',
         type: 'MULTIPLE_CHOICE' as const,
-        explanation: 'Organização é o que destrava filtro, ordenação, tabela dinâmica e gráfico.',
+        explanation:
+          'O projeto entrega geometria e especificação. Sequência executiva, produtividade e custo são construídos a partir da leitura.',
         options: [
-          { text: 'Criar uma tabela dinâmica', isCorrect: true },
-          { text: 'Filtrar e ordenar registros', isCorrect: true },
-          { text: 'Gerar gráficos confiáveis', isCorrect: true },
-          { text: 'Aumentar a velocidade da internet', isCorrect: false },
+          { text: 'A sequência executiva dos serviços', isCorrect: true },
+          { text: 'A produtividade das equipes', isCorrect: true },
+          { text: 'O custo da obra', isCorrect: true },
+          { text: 'As dimensões dos ambientes', isCorrect: false },
         ],
       },
     ];
@@ -421,11 +638,11 @@ async function main() {
         },
       });
     }
-    console.log('[seed] atividade de demonstração criada.');
+    console.log('[seed] atividade do módulo 1 criada.');
   }
 
-  // ------------------------------------------------------------- Aluno
-  const student = await db.user.upsert({
+  // ------------------------------------------------------ Aluno de teste
+  await db.user.upsert({
     where: { email: STUDENT_EMAIL },
     update: {},
     create: {
@@ -435,14 +652,6 @@ async function main() {
       role: 'STUDENT',
     },
   });
-
-  if (excel) {
-    await db.enrollment.upsert({
-      where: { userId_courseId: { userId: student.id, courseId: excel.id } },
-      update: {},
-      create: { userId: student.id, courseId: excel.id, source: 'seed' },
-    });
-  }
 
   console.log('\n[seed] pronto.');
   console.log(`  tutor  → ${TUTOR_EMAIL} / ${TUTOR_PASSWORD}`);

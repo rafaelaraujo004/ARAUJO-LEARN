@@ -46,6 +46,7 @@ model User {
   certificates   Certificate[]
   notifications  Notification[]
   coursesTaught  Course[]             @relation("CourseTutor")
+  requests       EnrollmentRequest[]
   uploads        MediaAsset[]         @relation("MediaUploader")
 
   @@index([role])
@@ -133,6 +134,20 @@ model Course {
   durationMinutes    Int?
   certificateEnabled Boolean          @default(true)
   position           Int              @default(0)
+
+  /// Preço em centavos. Nulo = curso gratuito/bônus.
+  /// O pagamento acontece fora da plataforma (PIX/cartão); o tutor libera o
+  /// acesso no painel. Os campos abaixo existem para que a integração com um
+  /// gateway no futuro não precise de migração.
+  priceCents         Int?
+  pixDiscountPercent Int              @default(10)
+  maxInstallments    Int              @default(12)
+  /// O que acompanha o curso: "Apostila", "Certificado", "Interação com o tutor"…
+  includes           String[]         @default([])
+  /// Curso bônus: não é vendido, é liberado como brinde.
+  isBonus            Boolean          @default(false)
+  /// Liberado automaticamente quando o aluno tiver acesso a TODOS estes cursos.
+  unlocksWithCourseIds String[]       @default([])
   tutorId            String
   tutor              User             @relation("CourseTutor", fields: [tutorId], references: [id])
   publishedAt        DateTime?
@@ -144,9 +159,39 @@ model Course {
   activities   Activity[]
   enrollments  Enrollment[]
   certificates Certificate[]
+  requests     EnrollmentRequest[]
 
   @@index([status, publishedAt])
   @@index([tutorId])
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
+
+/// Pedido de matrícula.
+///
+/// Enquanto o pagamento é combinado direto com o tutor (PIX ou cartão), este
+/// modelo é a ponte: o aluno registra o interesse, o tutor confirma o pagamento
+/// e libera o acesso em um clique. Quando existir um gateway, ele passa a
+/// aprovar o pedido automaticamente — sem mudar o resto da plataforma.
+model EnrollmentRequest {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status    RequestStatus @default(PENDING)
+  message   String?
+  /// pix | cartao | a-combinar
+  payment   String?
+  handledAt DateTime?
+  createdAt DateTime      @default(now())
+
+  @@unique([userId, courseId])
+  @@index([status, createdAt])
 }
 
 model Module {

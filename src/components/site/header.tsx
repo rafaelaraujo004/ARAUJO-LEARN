@@ -18,12 +18,12 @@ const LINKS = [
 ];
 
 export function SiteHeader({ user }: { user: SessionUser | null }) {
-  const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
-
-  React.useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // O menu guarda em qual rota foi aberto. Assim ele se fecha sozinho ao
+  // navegar, sem um efeito que dispara render em cascata.
+  const [openedAt, setOpenedAt] = React.useState<string | null>(null);
+  const open = openedAt === pathname;
+  const setOpen = (value: boolean) => setOpenedAt(value ? pathname : null);
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-brand-950/85 backdrop-blur-lg">

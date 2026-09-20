@@ -7,6 +7,7 @@ import {
   Award,
   BookOpen,
   ExternalLink,
+  Inbox,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -22,6 +23,7 @@ import type { SessionUser } from '@/server/auth/session';
 const NAV = [
   { href: '/admin', label: 'Visão geral', icon: LayoutDashboard, exact: true },
   { href: '/admin/cursos', label: 'Cursos', icon: BookOpen },
+  { href: '/admin/solicitacoes', label: 'Solicitações', icon: Inbox },
   { href: '/admin/alunos', label: 'Alunos', icon: Users },
   { href: '/admin/certificados', label: 'Certificados', icon: Award },
   { href: '/admin/perfil', label: 'Perfil do tutor', icon: UserCircle },
@@ -36,9 +38,11 @@ export function AdminShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => setOpen(false), [pathname]);
+  // O menu guarda em qual rota foi aberto. Assim ele se fecha sozinho ao
+  // navegar, sem um efeito que dispara render em cascata.
+  const [openedAt, setOpenedAt] = React.useState<string | null>(null);
+  const open = openedAt === pathname;
+  const setOpen = (value: boolean) => setOpenedAt(value ? pathname : null);
 
   const nav = (
     <nav aria-label="Seções do painel" className="flex flex-col gap-1">

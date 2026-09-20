@@ -24,6 +24,11 @@ export interface CourseCardData {
   accessType: 'FREE' | 'RESTRICTED';
   certificateEnabled: boolean;
   studentCount: number;
+  priceCents: number | null;
+  pixDiscountPercent: number;
+  maxInstallments: number;
+  includes: string[];
+  isBonus: boolean;
 }
 
 const CARD_SELECT = {
@@ -36,6 +41,11 @@ const CARD_SELECT = {
   accessType: true,
   certificateEnabled: true,
   durationMinutes: true,
+  priceCents: true,
+  pixDiscountPercent: true,
+  maxInstallments: true,
+  includes: true,
+  isBonus: true,
   _count: { select: { modules: true, enrollments: true } },
   modules: {
     select: {
@@ -63,6 +73,11 @@ async function toCard(course: CourseCardRow): Promise<CourseCardData> {
     accessType: course.accessType,
     certificateEnabled: course.certificateEnabled,
     studentCount: course._count.enrollments,
+    priceCents: course.priceCents,
+    pixDiscountPercent: course.pixDiscountPercent,
+    maxInstallments: course.maxInstallments,
+    includes: course.includes,
+    isBonus: course.isBonus,
   };
 }
 
@@ -156,6 +171,12 @@ export const COURSE_DETAIL_SELECT = {
   coverKey: true,
   durationMinutes: true,
   certificateEnabled: true,
+  priceCents: true,
+  pixDiscountPercent: true,
+  maxInstallments: true,
+  includes: true,
+  isBonus: true,
+  unlocksWithCourseIds: true,
   publishedAt: true,
   tutor: {
     select: {
@@ -165,7 +186,14 @@ export const COURSE_DETAIL_SELECT = {
       bio: true,
       avatarKey: true,
       tutorProfile: {
-        select: { headline: true, bio: true, specialties: true, methodology: true, photoKey: true },
+        select: {
+          headline: true,
+          bio: true,
+          specialties: true,
+          methodology: true,
+          photoKey: true,
+          socials: true,
+        },
       },
     },
   },

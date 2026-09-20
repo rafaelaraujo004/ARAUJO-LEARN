@@ -1,12 +1,17 @@
+import * as React from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
   Award,
   CheckCircle2,
   Compass,
+  CreditCard,
   FileText,
+  Gift,
+  MessagesSquare,
   MonitorPlay,
   MoveUpRight,
+  QrCode,
   Sparkles,
   Target,
   TrendingUp,
@@ -19,29 +24,30 @@ import { featuredCourses } from '@/server/courses';
 import { getPrimaryTutor } from '@/server/tutor';
 import { getCurrentUser } from '@/server/auth/session';
 import { SITE } from '@/lib/constants';
+import { formatPrice, pixPrice, whatsappDigits } from '@/lib/utils';
 
 export const revalidate = 300;
 
 const BENEFITS = [
   {
-    icon: MonitorPlay,
-    title: 'Aulas em vídeo, do seu jeito',
-    text: 'Assista no celular, tablet ou computador. A plataforma guarda onde você parou e retoma exatamente daquele ponto.',
+    icon: MessagesSquare,
+    title: 'Você fala com o tutor',
+    text: 'Não é videoaula solta. Durante toda a formação você tem canal aberto com o Eng. Amilton Araújo — inclusive para levar os projetos e orçamentos do seu próprio trabalho.',
   },
   {
-    icon: Compass,
-    title: 'Caminho claro do início ao fim',
-    text: 'Módulos em sequência, com o que já foi concluído e o que vem a seguir sempre à vista. Sem se perder.',
+    icon: Target,
+    title: 'Conteúdo que vira prática',
+    text: 'Cada módulo parte de uma situação real de obra e termina com uma tarefa aplicada. O critério é um só: você conseguir usar no dia seguinte.',
   },
   {
     icon: FileText,
-    title: 'Material que fica com você',
-    text: 'Apostilas, PDFs e arquivos de apoio disponíveis para download em cada aula e módulo.',
+    title: 'Apostila e material de apoio',
+    text: 'Você recebe apostila e material complementar para consultar depois, no escritório ou no canteiro. O conteúdo fica com você.',
   },
   {
     icon: Award,
-    title: 'Certificado com validação',
-    text: 'Ao concluir, o certificado é emitido automaticamente, com código único que qualquer pessoa pode conferir.',
+    title: 'Certificação ao concluir',
+    text: 'Ao terminar, o certificado é emitido automaticamente, com código único que qualquer pessoa — ou qualquer empresa — pode conferir online.',
   },
 ];
 
@@ -49,17 +55,17 @@ const METHOD = [
   {
     step: 'Aprenda',
     icon: MonitorPlay,
-    text: 'Conteúdo direto ao ponto, em aulas curtas e organizadas em módulos. Nada de encher linguiça: cada aula existe por um motivo.',
+    text: 'Aulas diretas ao ponto, organizadas em módulos, partindo de projetos e obras reais. Nada de teoria que não chega ao canteiro.',
   },
   {
     step: 'Evolua',
     icon: TrendingUp,
-    text: 'Atividades ao longo do curso confirmam o que você entendeu. Seu progresso fica registrado aula a aula, sem depender da sua memória.',
+    text: 'Tarefas práticas e checkpoints ao longo do curso, com o tutor disponível para revisar suas dúvidas e o seu raciocínio — não só a resposta.',
   },
   {
     step: 'Conquiste',
-    icon: Target,
-    text: 'Você termina com um resultado prático e um certificado que comprova a conclusão — com código de validação pública.',
+    icon: Award,
+    text: 'Você termina dominando o assunto de ponta a ponta, com certificado de conclusão e código de validação pública para comprovar.',
   },
 ];
 
@@ -71,6 +77,16 @@ export default async function HomePage() {
   ]);
 
   const totalStudents = tutor?.studentCount ?? 0;
+  const whatsapp = tutor?.socials.whatsapp ?? null;
+  const waLink = whatsapp
+    ? `https://wa.me/${whatsappDigits(whatsapp)}?text=${encodeURIComponent(
+        'Olá! Quero informações sobre os cursos da ARAÚJO LEARN.',
+      )}`
+    : null;
+
+  const paid = courses.filter((course) => !course.isBonus && course.priceCents);
+  const bonus = courses.find((course) => course.isBonus);
+  const bundleTotal = paid.reduce((total, course) => total + (course.priceCents ?? 0), 0);
 
   return (
     <>
@@ -80,18 +96,19 @@ export default async function HomePage() {
           <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="animate-rise">
               <Badge tone="muted" icon={<Sparkles className="size-3.5" />}>
-                Plataforma própria de cursos online
+                Formação técnica para quem vive de obra
               </Badge>
 
               <h1 className="mt-6 font-display text-4xl leading-[1.08] font-semibold text-white sm:text-5xl lg:text-[3.35rem]">
-                Conhecimento que vira{' '}
-                <span className="text-gradient-brand">resultado.</span>
+                Do projeto ao orçamento,{' '}
+                <span className="text-gradient-brand">com segurança técnica.</span>
               </h1>
 
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-brand-200">
-                A {SITE.name} reúne os cursos de um único tutor em um lugar só: aulas em vídeo,
-                materiais, atividades e certificado. Você aprende no seu ritmo — e a plataforma
-                lembra de onde você parou.
+                Cursos de engenharia civil conduzidos diretamente pelo{' '}
+                <strong className="font-semibold text-white">Eng. Amilton Araújo</strong>, com
+                acompanhamento do tutor durante toda a formação. Conteúdo suficiente para você sair
+                dominando o assunto — e com certificado para comprovar.
               </p>
 
               <p className="mt-6 font-display text-lg tracking-tight text-accent-300">
@@ -100,7 +117,7 @@ export default async function HomePage() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/cursos" variant="accent" size="lg">
-                  Ver cursos disponíveis
+                  Ver cursos e valores
                   <ArrowRight aria-hidden className="size-4.5" />
                 </ButtonLink>
                 {user ? (
@@ -121,7 +138,7 @@ export default async function HomePage() {
               <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-white/10 pt-8">
                 <Metric
                   value={tutor?.courseCount ?? 0}
-                  label={(tutor?.courseCount ?? 0) === 1 ? 'curso publicado' : 'cursos publicados'}
+                  label={(tutor?.courseCount ?? 0) === 1 ? 'curso disponível' : 'cursos disponíveis'}
                 />
                 <Metric
                   value={totalStudents}
@@ -139,23 +156,16 @@ export default async function HomePage() {
                     <TutorPhoto name={tutor.name} url={tutor.photoUrl} />
                     <div className="min-w-0">
                       <p className="text-xs font-semibold tracking-[0.14em] text-accent-300 uppercase">
-                        Seu tutor
+                        Professor e palestrante
                       </p>
                       <p className="mt-0.5 truncate font-display text-xl font-semibold text-white">
                         {tutor.name}
                       </p>
-                      {tutor.headline && (
-                        <p className="mt-0.5 line-clamp-2 text-sm text-brand-200">
-                          {tutor.headline}
-                        </p>
-                      )}
                     </div>
                   </div>
 
-                  {tutor.bio && (
-                    <p className="mt-5 line-clamp-4 text-sm leading-relaxed text-brand-200">
-                      {tutor.bio}
-                    </p>
+                  {tutor.headline && (
+                    <p className="mt-4 text-sm leading-relaxed text-brand-200">{tutor.headline}</p>
                   )}
 
                   {tutor.specialties.length > 0 && (
@@ -189,12 +199,11 @@ export default async function HomePage() {
             Por que estudar aqui
           </p>
           <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
-            Uma plataforma feita para você terminar o curso.
+            Curso com tutor presente — não com vídeo esquecido numa pasta.
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-ink-600">
-            A maior parte das pessoas não desiste por falta de vontade — desiste por falta de
-            clareza. Aqui, cada tela responde três perguntas: onde estou, o que falta e qual é o
-            próximo passo.
+            A diferença entre assistir a um curso e dominar um assunto é ter com quem falar quando a
+            dúvida aparece. Aqui o tutor acompanha você do começo ao certificado.
           </p>
         </header>
 
@@ -255,6 +264,65 @@ export default async function HomePage() {
               </ButtonLink>
             </div>
           )}
+
+          {/* ------------------------------------------------------- Bônus --- */}
+          {bonus && paid.length >= 2 && (
+            <div className="mt-10 overflow-hidden rounded-card border border-accent-200 bg-accent-50">
+              <div className="flex flex-wrap items-center gap-6 p-6 sm:p-8">
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-accent-400 text-brand-950">
+                  <Gift aria-hidden className="size-7" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold tracking-[0.14em] text-accent-700 uppercase">
+                    Bônus especial
+                  </p>
+                  <h3 className="mt-1.5 font-display text-2xl font-semibold text-brand-900">
+                    Levou os dois cursos? O terceiro é por nossa conta.
+                  </h3>
+                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-700">
+                    Ao adquirir{' '}
+                    {paid.map((course, index) => (
+                      <React.Fragment key={course.id}>
+                        {index > 0 && ' e '}
+                        <strong>{course.title}</strong>
+                      </React.Fragment>
+                    ))}
+                    , você ganha o curso <strong>{bonus.title}</strong> — liberado automaticamente
+                    na sua conta, sem custo adicional.
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  <p className="text-xs text-ink-500">Os dois cursos</p>
+                  <p className="font-display text-2xl font-semibold text-brand-900">
+                    {formatPrice(bundleTotal)}
+                  </p>
+                  <p className="text-xs text-ink-500">
+                    {formatPrice(pixPrice(bundleTotal, 10))} no PIX
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* --------------------------------------------------- Pagamento --- */}
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            <PayCard
+              icon={QrCode}
+              title="PIX com 10% de desconto"
+              text="Pagamento à vista, com desconto aplicado sobre o valor do curso."
+            />
+            <PayCard
+              icon={CreditCard}
+              title="Até 12x no cartão"
+              text="Parcelamento no cartão de crédito, combinado direto com o tutor."
+            />
+            <PayCard
+              icon={MessagesSquare}
+              title={whatsapp ?? 'Suporte direto'}
+              text="Informações, dúvidas e suporte por WhatsApp, antes e durante o curso."
+              href={waLink ?? undefined}
+            />
+          </div>
         </div>
       </section>
 
@@ -270,7 +338,7 @@ export default async function HomePage() {
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-ink-600">
               O slogan não é enfeite: é o desenho do curso. Cada módulo leva você de um degrau ao
-              seguinte.
+              seguinte, com o tutor acompanhando a subida.
             </p>
           </header>
 
@@ -296,6 +364,18 @@ export default async function HomePage() {
               </li>
             ))}
           </ol>
+
+          {tutor?.methodology && (
+            <div className="mt-10 rounded-card border border-ink-200 bg-white p-7 shadow-soft">
+              <h3 className="flex items-center gap-2 font-sans text-sm font-semibold text-ink-900">
+                <Compass aria-hidden className="size-4 text-brand-500" />
+                Como o tutor conduz
+              </h3>
+              <p className="mt-2 leading-relaxed whitespace-pre-line text-ink-600">
+                {tutor.methodology}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -306,7 +386,6 @@ export default async function HomePage() {
             <div className="relative">
               <div className="overflow-hidden rounded-card bg-brand-900">
                 {tutor.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={tutor.photoUrl}
                     alt={`Foto de ${tutor.name}`}
@@ -314,8 +393,9 @@ export default async function HomePage() {
                   />
                 ) : (
                   <div className="bg-night bg-grid grid aspect-[4/5] w-full place-items-center">
-                    <span className="font-display text-6xl font-semibold text-white/20">
+                    <span className="font-display relative text-6xl font-semibold text-white/20">
                       {tutor.name
+                        .replace(/^Eng\.\s*/i, '')
                         .split(' ')
                         .slice(0, 2)
                         .map((part) => part[0])
@@ -346,7 +426,7 @@ export default async function HomePage() {
 
               {tutor.experience && (
                 <div className="mt-6">
-                  <h3 className="font-sans text-sm font-semibold text-ink-900">Experiência</h3>
+                  <h3 className="font-sans text-sm font-semibold text-ink-900">Formação e experiência</h3>
                   <p className="mt-1.5 leading-relaxed whitespace-pre-line text-sm text-ink-600">
                     {tutor.experience}
                   </p>
@@ -381,17 +461,25 @@ export default async function HomePage() {
             Comece hoje. O primeiro passo leva dois minutos.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-brand-200">
-            Crie sua conta, escolha um curso e assista à primeira aula. A plataforma cuida do resto
-            — inclusive de lembrar onde você parou.
+            Crie sua conta, escolha o curso e combine o pagamento direto com o tutor. O acesso é
+            liberado na sequência — e a plataforma cuida do resto, inclusive de lembrar onde você
+            parou.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <ButtonLink href={user ? '/painel' : '/criar-conta'} variant="accent" size="lg">
               {user ? 'Ir para o meu painel' : 'Criar conta gratuita'}
               <ArrowRight aria-hidden className="size-4.5" />
             </ButtonLink>
-            <ButtonLink href="/cursos" variant="outline-light" size="lg">
-              Explorar os cursos
-            </ButtonLink>
+            {waLink ? (
+              <ButtonLink href={waLink} variant="outline-light" size="lg" target="_blank">
+                <MessagesSquare aria-hidden className="size-4.5" />
+                Falar com o tutor
+              </ButtonLink>
+            ) : (
+              <ButtonLink href="/cursos" variant="outline-light" size="lg">
+                Explorar os cursos
+              </ButtonLink>
+            )}
           </div>
         </div>
       </section>
@@ -411,10 +499,44 @@ function Metric({ value, label }: { value: number | string; label: string }) {
   );
 }
 
+function PayCard({
+  icon: Icon,
+  title,
+  text,
+  href,
+}: {
+  icon: React.ElementType;
+  title: string;
+  text: string;
+  href?: string;
+}) {
+  const content = (
+    <>
+      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+        <Icon aria-hidden className="size-5" />
+      </span>
+      <div className="min-w-0">
+        <p className="font-sans text-sm font-semibold text-ink-900">{title}</p>
+        <p className="mt-0.5 text-sm text-ink-600">{text}</p>
+      </div>
+    </>
+  );
+
+  const className =
+    'flex items-start gap-3 rounded-card border border-ink-200 bg-ink-50 p-5 transition-colors';
+
+  return href ? (
+    <a href={href} target="_blank" rel="noreferrer" className={`${className} hover:border-brand-300 hover:bg-white`}>
+      {content}
+    </a>
+  ) : (
+    <div className={className}>{content}</div>
+  );
+}
+
 function TutorPhoto({ name, url }: { name: string; url: string | null }) {
   if (url) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={url}
         alt={`Foto de ${name}`}
@@ -423,6 +545,7 @@ function TutorPhoto({ name, url }: { name: string; url: string | null }) {
     );
   }
   const letters = name
+    .replace(/^Eng\.\s*/i, '')
     .split(' ')
     .slice(0, 2)
     .map((part) => part[0])

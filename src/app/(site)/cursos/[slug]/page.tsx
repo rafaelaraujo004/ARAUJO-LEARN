@@ -10,6 +10,7 @@ import {
   FileText,
   Layers,
   Lock,
+  MessagesSquare,
   PlayCircle,
   Target,
   Users,
@@ -17,12 +18,13 @@ import {
 import { Badge, Card, Progress } from '@/components/ui/primitives';
 import { ButtonLink } from '@/components/ui/button';
 import { EnrollButton } from '@/components/course/enroll-button';
+import { CourseCta } from '@/components/course/course-cta';
 import { courseTotals, coverUrl, getCourseBySlug } from '@/server/courses';
 import { getCurrentUser, isStaff } from '@/server/auth/session';
 import { courseAccess } from '@/server/access';
 import { db } from '@/server/db';
 import { LEVEL_LABEL } from '@/lib/constants';
-import { formatDuration, pluralize } from '@/lib/utils';
+import { formatDuration, formatPrice, pixPrice, pluralize } from '@/lib/utils';
 
 export async function generateMetadata({
   params,
@@ -62,6 +64,18 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
       })
     : null;
 
+  const request = user
+    ? await db.enrollmentRequest.findUnique({
+        where: { userId_courseId: { userId: user.id, courseId: course.id } },
+        select: { status: true },
+      })
+    : null;
+  const requestStatus =
+    request?.status === 'PENDING' ? 'PENDING' : request?.status === 'DECLINED' ? 'DECLINED' : 'NONE';
+
+  const socials = (course.tutor.tutorProfile?.socials ?? {}) as Record<string, unknown>;
+  const whatsapp = typeof socials.whatsapp === 'string' && socials.whatsapp ? socials.whatsapp : null;
+
   const tutor = course.tutor;
   const tutorHeadline = tutor.tutorProfile?.headline ?? tutor.headline;
   const tutorBio = tutor.tutorProfile?.bio ?? tutor.bio;
@@ -70,9 +84,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
     ? enrollment && enrollment.progressPercent > 0
       ? 'Continuar de onde parei'
       : 'Começar o curso'
-    : user
-      ? 'Matricular-me neste curso'
-      : 'Criar conta e começar';
+    : 'Entrar para me matricular';
 
   return (
     <>
@@ -119,11 +131,9 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                   icon={Clock}
                   label="Duração"
                   value={
-                    totals.durationSeconds > 0
-                      ? formatDuration(totals.durationSeconds)
-                      : totals.durationMinutes > 0
-                        ? formatDuration(totals.durationMinutes * 60)
-                        : 'A definir'
+                    totals.durationMinutes > 0
+                      ? formatDuration(totals.durationMinutes * 60)
+                      : 'A definir'
                   }
                 />
                 {totals.materialCount > 0 && (
@@ -142,7 +152,6 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               <Card className="w-full overflow-hidden lg:w-80">
                 <div className="aspect-[16/9] bg-brand-900">
                   {cover ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={cover} alt="" className="size-full object-cover" />
                   ) : (
                     <div className="bg-night bg-grid grid size-full place-items-center">
@@ -183,43 +192,75 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                         Editar este curso
                       </ButtonLink>
                     </>
+                  ) : user ? (
+                    <CourseCta
+                      slug={course.slug}
+                      title={course.title}
+                      priceCents={course.priceCents}
+                      pixDiscountPercent={course.pixDiscountPercent}
+                      maxInstallments={course.maxInstallments}
+                      includes={course.includes}
+                      isBonus={course.isBonus}
+                      whatsapp={whatsapp}
+                      requestStatus={requestStatus}
+                    />
                   ) : (
                     <>
-                      <p className="text-sm text-ink-600">
-                        {course.accessType === 'FREE'
-                          ? 'Acesso liberado para alunos cadastrados. Sem custo.'
-                          : 'Este curso é liberado individualmente pelo tutor.'}
-                      </p>
-                      <div className="mt-4">
-                        {user ? (
-                          <EnrollButton slug={course.slug} mode="enroll" label={ctaLabel} />
-                        ) : (
-                          <ButtonLink
-                            href={`/entrar?next=${encodeURIComponent(`/cursos/${course.slug}`)}`}
-                            variant="accent"
-                            size="lg"
-                            block
-                          >
-                            {ctaLabel}
-                          </ButtonLink>
-                        )}
-                      </div>
+                      {course.priceCents && !course.isBonus && (
+                        <>
+                          <p className="text-xs font-medium tracking-wide text-ink-500 uppercase">
+                            Investimento
+                          </p>
+                          <p className="mt-1 font-display text-3xl font-semibold text-brand-900">
+                            {formatPrice(course.priceCents)}
+                          </p>
+                          <p className="mt-1 text-sm text-ink-600">
+                            {formatPrice(
+                              pixPrice(course.priceCents, course.pixDiscountPercent),
+                            )}{' '}
+                            no PIX · até {course.maxInstallments}x no cartão
+                          </p>
+                        </>
+                      )}
+                      {course.includes.length > 0 && (
+                        <ul className="mt-4 flex flex-col gap-1.5 text-sm text-ink-600">
+                          {course.includes.map((item) => (
+                            <li key={item} className="flex items-center gap-2">
+                              <CheckCircle2 aria-hidden className="size-4 shrink-0 text-progress-500" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <ButtonLink
+                        href={`/entrar?next=${encodeURIComponent(`/cursos/${course.slug}`)}`}
+                        variant="accent"
+                        size="lg"
+                        block
+                        className="mt-5"
+                      >
+                        {ctaLabel}
+                      </ButtonLink>
                     </>
                   )}
 
                   <ul className="mt-5 flex flex-col gap-2 border-t border-ink-200 pt-4 text-sm text-ink-600">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 aria-hidden className="size-4 text-progress-500" />
+                      <MessagesSquare aria-hidden className="size-4 shrink-0 text-brand-500" />
+                      Acompanhamento direto com o tutor
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 aria-hidden className="size-4 shrink-0 text-progress-500" />
                       Acesso pelo celular, tablet ou computador
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 aria-hidden className="size-4 text-progress-500" />
+                      <CheckCircle2 aria-hidden className="size-4 shrink-0 text-progress-500" />
                       Retoma de onde você parou
                     </li>
                     {course.certificateEnabled && (
                       <li className="flex items-center gap-2">
-                        <CheckCircle2 aria-hidden className="size-4 text-progress-500" />
-                        Certificado ao concluir
+                        <Award aria-hidden className="size-4 shrink-0 text-accent-500" />
+                        Certificado com código de validação
                       </li>
                     )}
                   </ul>

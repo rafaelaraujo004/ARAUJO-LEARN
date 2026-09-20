@@ -19,10 +19,29 @@ Sem isso, o app roda localmente contra o Postgres embutido de desenvolvimento, e
 uploads usam o driver de storage local (`STORAGE_DRIVER=local`). Nenhuma outra parte
 do projeto depende dessas credenciais.
 
-## 2. Conteúdo real (identidade do tutor)
-**O que falta:** foto do tutor, biografia definitiva, textos de marca e cursos reais.
-Hoje há conteúdo de demonstração no seed (`prisma/seed.ts`), claramente marcado, e a
-foto do tutor usa um avatar gerado. Substituível pelo painel, sem tocar em código.
+## 2. Conteúdo das aulas (vídeos, apostila e foto do tutor)
+**O que falta:** os vídeos das aulas, a apostila/material complementar e a foto do
+Eng. Amilton Araújo.
+
+O que já está pronto: tutor, os três cursos reais (com preços, carga horária e o que
+acompanha cada um), a estrutura completa de módulos e aulas, e o texto de algumas
+aulas. Tudo isso foi montado como **base de partida** — títulos, ementas e textos são
+editáveis pelo painel, sem tocar em código.
+
+Quando voltar: entre em **Painel → Cursos → Conteúdo**, abra cada aula, envie o vídeo e
+anexe os materiais. Em **Painel → Perfil do tutor**, envie sua foto.
+
+## 2b. Pagamento (gateway)
+**O que falta:** decidir se quer cobrança automática (Mercado Pago, Asaas, Stripe…).
+
+Hoje o fluxo está completo e funcional **sem gateway**: o aluno vê o preço, escolhe PIX
+ou cartão, registra o pedido e fala com você pelo WhatsApp; você confirma o pagamento e
+libera o acesso em **Painel → Solicitações**. O curso bônus entra sozinho quando os dois
+cursos estão liberados.
+
+Se um dia quiser automatizar, o ponto de integração é único: chamar
+`approveRequestAction` quando o gateway confirmar o pagamento
+(`src/server/actions/requests.ts`). Nada mais muda.
 
 ## 3. E-mail transacional (recuperação de senha)
 **O que falta:** credenciais SMTP ou chave de um provedor (Resend/Postmark).

@@ -188,6 +188,8 @@ model EnrollmentRequest {
   message   String?
   /// pix | cartao | a-combinar
   payment   String?
+  /// Quando o pagamento for confirmado (manual pelo tutor ou futuro gateway).
+  paymentConfirmedAt DateTime?
   handledAt DateTime?
   createdAt DateTime      @default(now())
 

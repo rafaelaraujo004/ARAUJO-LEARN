@@ -20,7 +20,7 @@ import { EnrollButton } from '@/components/course/enroll-button';
 import { CourseCta } from '@/components/course/course-cta';
 import { courseTotals, coverUrl, getCourseBySlug } from '@/server/courses';
 import { getCurrentUser, isStaff } from '@/server/auth/session';
-import { courseAccess } from '@/server/access';
+import { bonusPrerequisitesMet, courseAccess } from '@/server/access';
 import { db } from '@/server/db';
 import { TUTOR_FIELD_PHOTO } from '@/server/tutor';
 import { LEVEL_LABEL } from '@/lib/constants';
@@ -72,6 +72,9 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
     : null;
   const requestStatus =
     request?.status === 'PENDING' ? 'PENDING' : request?.status === 'DECLINED' ? 'DECLINED' : 'NONE';
+
+  const bonusCheck =
+    user && course.isBonus ? await bonusPrerequisitesMet(user.id, course.id) : { met: true, missing: [] as string[] };
 
   const socials = (course.tutor.tutorProfile?.socials ?? {}) as Record<string, unknown>;
   const whatsapp = typeof socials.whatsapp === 'string' && socials.whatsapp ? socials.whatsapp : null;
@@ -199,6 +202,8 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                       maxInstallments={course.maxInstallments}
                       includes={course.includes}
                       isBonus={course.isBonus}
+                      bonusUnlocked={bonusCheck.met}
+                      bonusMissing={bonusCheck.missing}
                       whatsapp={whatsapp}
                       requestStatus={requestStatus}
                     />

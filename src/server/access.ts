@@ -253,6 +253,48 @@ export async function unlockBonusCourses(userId: string): Promise<string[]> {
   return unlocked;
 }
 
+/**
+ * O aluno cumpriu os pré-requisitos do curso bônus?
+ * Retorna true se o curso não é bônus, ou se o aluno já tem acesso ativo a
+ * todos os cursos listados em `unlocksWithCourseIds`.
+ */
+export async function bonusPrerequisitesMet(
+  userId: string,
+  courseId: string,
+): Promise<{ met: boolean; missing: string[] }> {
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    select: { isBonus: true, unlocksWithCourseIds: true },
+  });
+  if (!course || !course.isBonus || course.unlocksWithCourseIds.length === 0) {
+    return { met: true, missing: [] };
+  }
+
+  const now = Date.now();
+  const enrollments = await db.enrollment.findMany({
+    where: { userId, courseId: { in: course.unlocksWithCourseIds } },
+    select: { courseId: true, status: true, expiresAt: true },
+  });
+  const active = new Set(
+    enrollments
+      .filter(
+        (e) =>
+          (e.status === 'ACTIVE' || e.status === 'COMPLETED') &&
+          (!e.expiresAt || e.expiresAt.getTime() > now),
+      )
+      .map((e) => e.courseId),
+  );
+
+  const missingIds = course.unlocksWithCourseIds.filter((id) => !active.has(id));
+  if (missingIds.length === 0) return { met: true, missing: [] };
+
+  const missingCourses = await db.course.findMany({
+    where: { id: { in: missingIds } },
+    select: { title: true },
+  });
+  return { met: false, missing: missingCourses.map((c) => c.title) };
+}
+
 export async function revokeAccess(userId: string, courseId: string): Promise<void> {
   await db.enrollment.updateMany({
     where: { userId, courseId },

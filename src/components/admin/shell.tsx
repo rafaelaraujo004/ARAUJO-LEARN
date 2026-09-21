@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '@/components/brand/logo';
 import { Avatar } from '@/components/ui/primitives';
+import { NotificationBell } from '@/components/ui/notification-bell';
 import { cn } from '@/lib/utils';
 import type { SessionUser } from '@/server/auth/session';
 
@@ -79,7 +80,9 @@ export function AdminShell({
         <Link href="/admin" aria-label="Painel, ARAÚJO LEARN">
           <Logo variant="light" />
         </Link>
-        <button
+        <div className="flex items-center gap-1">
+          <NotificationBell variant="dark" />
+          <button
           type="button"
           onClick={() => setOpen(!open)}
           aria-expanded={open}
@@ -89,6 +92,7 @@ export function AdminShell({
         >
           {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
         </button>
+        </div>
       </div>
 
       {open && (
@@ -104,9 +108,12 @@ export function AdminShell({
           <Link href="/admin" aria-label="Painel, ARAÚJO LEARN" className="block">
             <Logo variant="light" />
           </Link>
-          <p className="mt-1 ml-[3.1rem] text-[0.6875rem] font-medium tracking-[0.14em] text-accent-300 uppercase">
-            Painel do tutor
-          </p>
+          <div className="mt-1 ml-[3.1rem] flex items-center justify-between">
+            <p className="text-[0.6875rem] font-medium tracking-[0.14em] text-accent-300 uppercase">
+              Painel do tutor
+            </p>
+            <NotificationBell variant="dark" />
+          </div>
           <div className="mt-8">{nav}</div>
         </div>
         <AccountBlock user={user} />

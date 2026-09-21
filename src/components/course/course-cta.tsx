@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useActionState } from 'react';
-import { CheckCircle2, Clock3, CreditCard, MessageCircle, QrCode, Sparkles } from 'lucide-react';
+import { CheckCircle2, Clock3, CreditCard, Lock, MessageCircle, QrCode, Sparkles } from 'lucide-react';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/field';
 import { Alert, Badge } from '@/components/ui/primitives';
@@ -26,6 +26,8 @@ export function CourseCta({
   maxInstallments,
   includes,
   isBonus,
+  bonusUnlocked = true,
+  bonusMissing = [],
   whatsapp,
   requestStatus,
 }: {
@@ -36,6 +38,8 @@ export function CourseCta({
   maxInstallments: number;
   includes: string[];
   isBonus: boolean;
+  bonusUnlocked?: boolean;
+  bonusMissing?: string[];
   whatsapp: string | null;
   requestStatus: 'NONE' | 'PENDING' | 'DECLINED';
 }) {
@@ -53,14 +57,31 @@ export function CourseCta({
   return (
     <div>
       {isBonus ? (
-        <div className="rounded-xl border border-accent-200 bg-accent-50 px-4 py-3">
-          <p className="flex items-center gap-2 text-sm font-semibold text-accent-700">
-            <Sparkles aria-hidden className="size-4" />
+        <div className={`rounded-xl border px-4 py-3 ${bonusUnlocked ? 'border-accent-200 bg-accent-50' : 'border-ink-200 bg-ink-50'}`}>
+          <p className={`flex items-center gap-2 text-sm font-semibold ${bonusUnlocked ? 'text-accent-700' : 'text-ink-600'}`}>
+            {bonusUnlocked ? (
+              <Sparkles aria-hidden className="size-4" />
+            ) : (
+              <Lock aria-hidden className="size-4" />
+            )}
             Curso bônus
           </p>
-          <p className="mt-1 text-sm text-accent-700/90">
-            Liberado automaticamente para quem adquire os dois cursos da formação.
-          </p>
+          {bonusUnlocked ? (
+            <p className="mt-1 text-sm text-accent-700/90">
+              Você cumpriu os pré-requisitos. Solicite o acesso ao bônus.
+            </p>
+          ) : (
+            <>
+              <p className="mt-1 text-sm text-ink-600">
+                Adquira os dois cursos da formação para liberar este bônus.
+              </p>
+              {bonusMissing.length > 0 && (
+                <p className="mt-1.5 text-xs text-ink-500">
+                  Faltam: {bonusMissing.join(', ')}
+                </p>
+              )}
+            </>
+          )}
         </div>
       ) : priceCents ? (
         <div>
@@ -100,7 +121,11 @@ export function CourseCta({
       )}
 
       <div className="mt-5">
-        {sent ? (
+        {isBonus && !bonusUnlocked ? (
+          <ButtonLink href="/cursos" variant="secondary" size="lg" block>
+            Ver cursos da formação
+          </ButtonLink>
+        ) : sent ? (
           <div className="flex flex-col gap-3">
             <Alert tone="success" title="Pedido registrado" icon={<Clock3 className="size-4" />}>
               {state.message ??

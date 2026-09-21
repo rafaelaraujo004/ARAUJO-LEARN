@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, LogOut, Menu, Settings, X } from 'lucide-react';
 import { Logo } from '@/components/brand/logo';
 import { ButtonLink } from '@/components/ui/button';
+import { NotificationBell } from '@/components/ui/notification-bell';
 import { Avatar } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
 import type { SessionUser } from '@/server/auth/session';
@@ -61,6 +62,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                 <LayoutDashboard aria-hidden className="size-4" />
                 {user.role === 'STUDENT' ? 'Meu painel' : 'Painel do tutor'}
               </ButtonLink>
+              <NotificationBell variant="dark" />
               <Link
                 href="/conta"
                 className="rounded-full transition-opacity hover:opacity-80"

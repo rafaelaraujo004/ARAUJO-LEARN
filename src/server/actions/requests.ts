@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/server/db';
 import { getCurrentUser } from '@/server/auth/session';
 import { requireStaff } from '@/server/auth/guards';
-import { grantAccess } from '@/server/access';
+import { bonusPrerequisitesMet, grantAccess } from '@/server/access';
 import { refreshCourseProgress } from '@/server/progress';
 import type { FormState } from '@/lib/form-state';
 
@@ -47,6 +47,14 @@ export async function requestEnrollmentAction(
   });
   if (enrollment && enrollment.status !== 'REVOKED') {
     return { ok: true, message: 'Você já tem acesso a este curso.' };
+  }
+
+  const prereqs = await bonusPrerequisitesMet(user.id, course.id);
+  if (!prereqs.met) {
+    return {
+      ok: false,
+      message: `Este curso bônus exige acesso aos cursos: ${prereqs.missing.join(', ')}. Adquira os cursos da formação para liberar o bônus.`,
+    };
   }
 
   const payment = text(formData, 'payment') || 'a-combinar';
@@ -105,9 +113,10 @@ export async function approveRequestAction(requestId: string): Promise<FormState
   await grantAccess(request.userId, request.courseId, { source: 'tutor' });
   await refreshCourseProgress(request.userId, request.courseId);
 
+  const now = new Date();
   await db.enrollmentRequest.update({
     where: { id: requestId },
-    data: { status: 'APPROVED', handledAt: new Date() },
+    data: { status: 'APPROVED', paymentConfirmedAt: now, handledAt: now },
   });
 
   await db.notification.create({

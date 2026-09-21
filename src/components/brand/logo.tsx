@@ -36,6 +36,10 @@ export function LogoMark({
   );
 }
 
+/**
+ * Logotipo: o "A" de ARAÚJO é o próprio símbolo da marca — [A]RAÚJO LEARN.
+ * O símbolo entra no lugar da letra, no mesmo alinhamento da linha de base.
+ */
 export function Logo({
   className,
   variant = 'dark',
@@ -45,33 +49,37 @@ export function Logo({
   variant?: 'dark' | 'light';
   showSlogan?: boolean;
 }) {
+  const light = variant === 'light';
   return (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <LogoMark className={variant === 'light' ? 'text-white' : 'text-brand-900'} />
-      <span className="flex flex-col leading-none">
+    <span className={cn('inline-flex flex-col leading-none', className)}>
+      <span
+        role="img"
+        aria-label="ARAÚJO LEARN"
+        className={cn(
+          'inline-flex items-center font-display text-[1.25rem] font-semibold tracking-tight',
+          light ? 'text-white' : 'text-brand-900',
+        )}
+      >
+        <span
+          aria-hidden
+          style={MARK_STYLE}
+          className="-mr-[0.12em] inline-block h-[1.55em] w-[1.55em] shrink-0 bg-current"
+        />
+        <span aria-hidden>RAÚJO</span>
+        <span aria-hidden className={light ? 'text-accent-300' : 'text-accent-500'}>
+          &nbsp;LEARN
+        </span>
+      </span>
+      {showSlogan && (
         <span
           className={cn(
-            'font-display text-[1.0625rem] font-semibold tracking-tight',
-            variant === 'light' ? 'text-white' : 'text-brand-900',
+            'mt-1.5 text-[0.6875rem] font-medium tracking-[0.14em] uppercase',
+            light ? 'text-brand-200' : 'text-ink-500',
           )}
         >
-          ARAÚJO
-          <span className={variant === 'light' ? 'text-accent-300' : 'text-accent-500'}>
-            {' '}
-            LEARN
-          </span>
+          Aprenda. Evolua. Conquiste.
         </span>
-        {showSlogan && (
-          <span
-            className={cn(
-              'mt-1 text-[0.6875rem] font-medium tracking-[0.14em] uppercase',
-              variant === 'light' ? 'text-brand-200' : 'text-ink-500',
-            )}
-          >
-            Aprenda. Evolua. Conquiste.
-          </span>
-        )}
-      </span>
+      )}
     </span>
   );
 }

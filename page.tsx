@@ -26,11 +26,6 @@ import { pluralize, whatsappDigits } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
-export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
-export const revalidate = 300;
-
 export async function generateMetadata(): Promise<Metadata> {
   const tutor = await getPrimaryTutor();
   if (!tutor) return { title: 'O tutor' };

@@ -78,7 +78,7 @@ export default async function MyCoursesPage() {
   const cards = await Promise.all(
     enrollments.map(async (item) => ({
       enrollment: item,
-      cover: await coverUrl(item.course.coverKey),
+      cover: await coverUrl(item.course.coverKey, item.course.slug),
       target:
         item.status === 'ACTIVE' || item.status === 'COMPLETED'
           ? await nextLessonFor(user.id, item.course.id)

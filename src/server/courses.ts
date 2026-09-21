@@ -65,7 +65,7 @@ async function toCard(course: CourseCardRow): Promise<CourseCardData> {
     title: course.title,
     shortDescription: course.shortDescription,
     level: course.level,
-    coverUrl: await coverUrl(course.coverKey),
+    coverUrl: await coverUrl(course.coverKey, course.slug),
     moduleCount: course._count.modules,
     lessonCount: lessons.length,
     durationSeconds: lessons.reduce((total, lesson) => total + lesson.durationSeconds, 0),
@@ -81,15 +81,23 @@ async function toCard(course: CourseCardRow): Promise<CourseCardData> {
   };
 }
 
-/** URL temporária da capa; `null` quando o curso ainda não tem imagem. */
-export async function coverUrl(key: string | null): Promise<string | null> {
-  if (!key) return null;
-  try {
-    // Capas são públicas na prática — validade maior evita reassinar a cada visita.
-    return await storage().getSignedUrl(key, { expiresIn: 60 * 60 * 6 });
-  } catch {
-    return null;
+/** Imagem estática de fallback para cursos sem capa no bucket. */
+const STATIC_COVERS: Record<string, string> = {
+  'leitura-e-interpretacao-de-projetos-de-engenharia': '/cursos/leitura-projetos.svg',
+  'orcamento-preliminar-de-obras-civis': '/cursos/orcamento-obras.svg',
+  'legislacao-de-obra-e-sistema-crea': '/cursos/legislacao-crea.svg',
+};
+
+/** URL temporária da capa; fallback estático quando o curso ainda não tem imagem no bucket. */
+export async function coverUrl(key: string | null, slug?: string): Promise<string | null> {
+  if (key) {
+    try {
+      return await storage().getSignedUrl(key, { expiresIn: 60 * 60 * 6 });
+    } catch {
+      // Continua para o fallback.
+    }
   }
+  return (slug && STATIC_COVERS[slug]) ?? null;
 }
 
 export interface CatalogFilters {

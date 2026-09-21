@@ -51,7 +51,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
 
   const [access, cover] = await Promise.all([
     courseAccess(user, course.id),
-    coverUrl(course.coverKey),
+    coverUrl(course.coverKey, course.slug),
   ]);
 
   const totals = courseTotals(course);

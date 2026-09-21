@@ -47,7 +47,7 @@ export default async function EditCoursePage({ params }: { params: Promise<{ id:
   });
   if (!course) notFound();
 
-  const cover = await coverUrl(course.coverKey);
+  const cover = await coverUrl(course.coverKey, course.slug);
 
   return (
     <>

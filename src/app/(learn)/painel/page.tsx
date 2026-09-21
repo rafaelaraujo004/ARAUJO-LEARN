@@ -81,7 +81,7 @@ export default async function StudentDashboardPage() {
   // Curso mais recente: é para ele que o botão "Continuar aprendendo" aponta.
   const current = inProgress[0] ?? null;
   const target = current ? await nextLessonFor(user.id, current.course.id) : null;
-  const currentCover = current ? await coverUrl(current.course.coverKey) : null;
+  const currentCover = current ? await coverUrl(current.course.coverKey, current.course.slug) : null;
 
   const firstName = user.name.split(' ')[0];
 

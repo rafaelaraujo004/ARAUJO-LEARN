@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#0c2456"/>
+      <stop offset="100%" stop-color="#142e5c"/>
+    </linearGradient>
+    <linearGradient id="gold3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c8832c"/>
+      <stop offset="100%" stop-color="#e6a84f"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg3)"/>
+  <!-- Scales of justice -->
+  <g transform="translate(450, 50)" opacity="0.12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="130" y1="30" x2="130" y2="320"/>
+    <rect x="100" y="320" width="60" height="12" rx="3"/>
+    <rect x="85" y="332" width="90" height="8" rx="2"/>
+    <line x1="130" y1="60" x2="30" y2="100"/>
+    <path d="M 10 100 Q 30 180 50 100"/>
+    <line x1="130" y1="60" x2="230" y2="120"/>
+    <path d="M 210 120 Q 230 200 250 120"/>
+    <circle cx="130" cy="30" r="8" fill="#c8832c" opacity="0.4"/>
+  </g>
+  <!-- Shield behind -->
+  <g transform="translate(560, 200)" opacity="0.08" fill="#fff">
+    <path d="M 0 10 L 60 0 L 60 100 Q 30 120 0 100 Z"/>
+  </g>
+  <!-- Badge BONUS -->
+  <g transform="translate(60, 80)">
+    <rect x="0" y="0" width="80" height="28" rx="14" fill="#c8832c"/>
+    <text x="40" y="19" fill="#fff" font-family="Inter,system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="0.05em">BÔNUS</text>
+  </g>
+  <!-- Golden accent line -->
+  <rect x="60" y="380" width="120" height="4" rx="2" fill="url(#gold3)"/>
+  <!-- Title -->
+  <text x="60" y="190" fill="#fff" font-family="Inter,system-ui,sans-serif" font-size="36" font-weight="700" letter-spacing="-0.02em">
+    <tspan x="60" dy="0">Legislação de</tspan>
+    <tspan x="60" dy="46">Obra e Sistema</tspan>
+    <tspan x="60" dy="46">CREA</tspan>
+  </text>
+  <text x="60" y="345" fill="#c8832c" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="600" letter-spacing="0.1em">ENGENHARIA CIVIL</text>
+</svg>

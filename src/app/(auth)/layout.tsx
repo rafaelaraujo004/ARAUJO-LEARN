@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
       <div className="flex flex-col px-4 py-8 sm:px-8">
-        <Link href="/" aria-label="ARAÚJO LEARN — página inicial" className="self-start">
+        <Link href="/" aria-label="ARAÚJO LEARN, página inicial" className="self-start">
           <Logo />
         </Link>
 
@@ -37,7 +37,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </p>
           <p className="mt-4 leading-relaxed text-brand-100">
             Cada aula assistida é um passo a menos entre você e a obra que você quer fechar. A
-            plataforma guarda onde você parou — você só precisa voltar.
+            plataforma guarda onde você parou, você só precisa voltar.
           </p>
         </div>
 

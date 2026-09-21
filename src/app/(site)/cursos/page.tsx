@@ -67,7 +67,7 @@ export default async function CatalogPage({
             Escolha o curso que resolve o seu problema.
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-brand-100">
-            Direto ao ponto, do jeito que a obra pede. Você termina sabendo fazer — e com certificado
+            Direto ao ponto, do jeito que a obra pede. Você termina sabendo fazer, e com certificado
             para provar.
           </p>
         </div>

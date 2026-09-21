@@ -47,7 +47,7 @@ export default async function AdminCoursesPage() {
           <EmptyState
             icon={<BookOpen className="size-5" />}
             title="Nenhum curso criado"
-            description="Um curso é formado por módulos, e cada módulo por aulas. Comece criando o curso — a estrutura vem depois."
+            description="Um curso é formado por módulos, e cada módulo por aulas. Comece criando o curso, a estrutura vem depois."
             action={<ButtonLink href="/admin/cursos/novo">Criar meu primeiro curso</ButtonLink>}
           />
         ) : (

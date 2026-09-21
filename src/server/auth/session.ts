@@ -37,7 +37,7 @@ export function tokenHash(token: string): string {
 
 export type SessionUser = Pick<
   User,
-  'id' | 'name' | 'email' | 'role' | 'avatarKey' | 'headline' | 'isActive'
+  'id' | 'name' | 'email' | 'role' | 'avatarKey' | 'headline' | 'isActive' | 'mustChangePassword'
 >;
 
 const SESSION_USER_SELECT = {
@@ -48,6 +48,7 @@ const SESSION_USER_SELECT = {
   avatarKey: true,
   headline: true,
   isActive: true,
+  mustChangePassword: true,
 } as const;
 
 /** Cria a sessão no banco e devolve o token que vai para o cookie. */

@@ -123,7 +123,7 @@ export default async function CourseStudentsPage({
                         </Badge>
                       </div>
                       <p className="w-24 shrink-0 text-right text-xs text-ink-500">
-                        {item.lastActivityAt ? formatRelative(item.lastActivityAt) : '—'}
+                        {item.lastActivityAt ? formatRelative(item.lastActivityAt) : 'Sem registro'}
                       </p>
                     </Link>
                   </li>

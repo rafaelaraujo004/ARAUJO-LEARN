@@ -53,13 +53,13 @@ export function formatBytes(bytes: number): string {
 }
 
 export function formatDate(value: Date | string | null | undefined): string {
-  if (!value) return '—';
+  if (!value) return 'Sem registro';
   const date = typeof value === 'string' ? new Date(value) : value;
   return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(date);
 }
 
 export function formatDateTime(value: Date | string | null | undefined): string {
-  if (!value) return '—';
+  if (!value) return 'Sem registro';
   const date = typeof value === 'string' ? new Date(value) : value;
   return new Intl.DateTimeFormat('pt-BR', {
     dateStyle: 'medium',
@@ -69,7 +69,7 @@ export function formatDateTime(value: Date | string | null | undefined): string 
 
 /** "há 3 dias" — usado no dashboard para a última atividade. */
 export function formatRelative(value: Date | string | null | undefined): string {
-  if (!value) return '—';
+  if (!value) return 'Sem registro';
   const date = typeof value === 'string' ? new Date(value) : value;
   const diffMs = date.getTime() - Date.now();
   const abs = Math.abs(diffMs);

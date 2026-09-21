@@ -70,9 +70,9 @@ export function passwordResetEmail(name: string, link: string): Omit<MailMessage
     '',
     link,
     '',
-    'Se não foi você, ignore este e-mail — nada será alterado.',
+    'Se não foi você, ignore este e-mail, nada será alterado.',
     '',
-    `${SITE.name} — ${SITE.slogan}`,
+    `${SITE.name} | ${SITE.slogan}`,
   ].join('\n');
 
   return {
@@ -81,8 +81,8 @@ export function passwordResetEmail(name: string, link: string): Omit<MailMessage
     html: `<p>Olá, ${escapeHtml(name)}.</p>
 <p>Recebemos um pedido para redefinir sua senha na <strong>${SITE.name}</strong>.</p>
 <p><a href="${link}">Criar uma nova senha</a> (o link vale por 1 hora).</p>
-<p>Se não foi você, ignore este e-mail — nada será alterado.</p>
-<p style="color:#6b7280">${SITE.name} — ${SITE.slogan}</p>`,
+<p>Se não foi você, ignore este e-mail, nada será alterado.</p>
+<p style="color:#6b7280">${SITE.name}, ${SITE.slogan}</p>`,
   };
 }
 

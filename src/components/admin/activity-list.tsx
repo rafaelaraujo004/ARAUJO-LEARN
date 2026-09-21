@@ -116,7 +116,7 @@ export function ActivityList({
                   </p>
                   {activity.questionCount === 0 && (
                     <p className="mt-1 text-xs font-medium text-accent-600">
-                      Sem perguntas — os alunos não conseguem responder.
+                      Sem perguntas, os alunos não conseguem responder.
                     </p>
                   )}
                 </div>

@@ -76,7 +76,7 @@ export function AdminShell({
 
       {/* Topo mobile */}
       <div className="flex h-16 items-center justify-between border-b border-white/10 bg-brand-950 px-4 lg:hidden">
-        <Link href="/admin" aria-label="Painel — ARAÚJO LEARN">
+        <Link href="/admin" aria-label="Painel, ARAÚJO LEARN">
           <Logo variant="light" />
         </Link>
         <button
@@ -101,7 +101,7 @@ export function AdminShell({
       {/* Lateral desktop */}
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between border-r border-white/10 bg-brand-950 p-5 lg:flex">
         <div>
-          <Link href="/admin" aria-label="Painel — ARAÚJO LEARN" className="block">
+          <Link href="/admin" aria-label="Painel, ARAÚJO LEARN" className="block">
             <Logo variant="light" />
           </Link>
           <p className="mt-1 ml-[3.1rem] text-[0.6875rem] font-medium tracking-[0.14em] text-accent-300 uppercase">

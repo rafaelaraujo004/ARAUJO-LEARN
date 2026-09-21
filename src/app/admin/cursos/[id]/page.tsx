@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const course = await db.course.findUnique({ where: { id }, select: { title: true } });
-  return { title: course ? `${course.title} — informações` : 'Curso' };
+  return { title: course ? `${course.title}, informações` : 'Curso' };
 }
 
 export default async function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {

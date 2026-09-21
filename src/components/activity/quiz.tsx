@@ -21,7 +21,7 @@ const TYPE_HINT: Record<QuizQuestion['type'], string> = {
   SINGLE_CHOICE: 'Marque uma alternativa.',
   TRUE_FALSE: 'Marque uma alternativa.',
   MULTIPLE_CHOICE: 'Marque todas as alternativas corretas.',
-  TEXT: 'Resposta escrita — não vale nota, mas fica registrada.',
+  TEXT: 'Resposta escrita, não vale nota, mas fica registrada.',
 };
 
 /**
@@ -158,7 +158,7 @@ export function Quiz({
                 <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-progress-700">
                   <Award aria-hidden className="size-4.5" />
                   Curso concluído
-                  {feedback.certificateCode && ' — seu certificado já está disponível.'}
+                  {feedback.certificateCode && ', seu certificado já está disponível.'}
                 </p>
               )}
             </div>

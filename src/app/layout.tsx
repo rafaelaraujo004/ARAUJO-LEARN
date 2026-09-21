@@ -21,7 +21,7 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: {
-    default: `${SITE.name} — ${SITE.slogan}`,
+    default: `${SITE.name} | ${SITE.slogan}`,
     template: `%s · ${SITE.name}`,
   },
   description: SITE.description,
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'pt_BR',
     siteName: SITE.name,
-    title: `${SITE.name} — ${SITE.slogan}`,
+    title: `${SITE.name} | ${SITE.slogan}`,
     description: SITE.description,
   },
   robots: { index: true, follow: true },

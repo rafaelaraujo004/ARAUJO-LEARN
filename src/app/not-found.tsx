@@ -8,7 +8,7 @@ export default function NotFound() {
   return (
     <main className="bg-night bg-grid relative grid min-h-dvh place-items-center px-4">
       <div className="relative max-w-md text-center">
-        <Link href="/" aria-label="ARAÚJO LEARN — página inicial" className="inline-block">
+        <Link href="/" aria-label="ARAÚJO LEARN, página inicial" className="inline-block">
           <Logo variant="light" />
         </Link>
 

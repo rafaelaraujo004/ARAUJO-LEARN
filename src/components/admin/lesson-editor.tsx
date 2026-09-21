@@ -77,7 +77,7 @@ export function LessonEditor({ lesson }: { lesson: LessonEditorData }) {
       <Card>
         <CardHeader
           title="Vídeo da aula"
-          description="Enviado direto para o armazenamento — o arquivo não passa pelo servidor da aplicação."
+          description="Enviado direto para o armazenamento, o arquivo não passa pelo servidor da aplicação."
         />
         <div className="p-5">
           <FileUpload

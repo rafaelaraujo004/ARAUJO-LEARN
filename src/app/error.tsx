@@ -30,7 +30,7 @@ export default function ErrorPage({
           Algo saiu do esperado.
         </h1>
         <p className="mt-2 text-ink-600">
-          Isso não foi culpa sua. Tente de novo — se continuar, volte ao início e avise o tutor.
+          Isso não foi culpa sua. Tente de novo, se continuar, volte ao início e avise o tutor.
         </p>
         {error.digest && (
           <p className="mt-3 font-mono text-xs text-ink-400">Código do erro: {error.digest}</p>

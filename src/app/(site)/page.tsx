@@ -125,7 +125,7 @@ export default async function HomePage() {
 
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-brand-100">
                 Leia qualquer projeto com segurança. Faça orçamentos que fecham a conta. E tenha um
-                certificado que prova que você sabe — não só que assistiu.
+                certificado que prova que você sabe, não só que assistiu.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -197,7 +197,7 @@ export default async function HomePage() {
               Você já passou por isso?
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-ink-600">
-              Não é falta de capacidade. É falta de método. E método se aprende — em semanas, não em
+              Não é falta de capacidade. É falta de método. E método se aprende, em semanas, não em
               anos de tentativa e erro.
             </p>
           </header>
@@ -262,7 +262,7 @@ export default async function HomePage() {
               Quanto custa não saber?
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-brand-100">
-              Você não está pagando por aulas. Está pagando para não cometer o erro caro — aquele
+              Você não está pagando por aulas. Está pagando para não cometer o erro caro, aquele
               que aparece só depois que o dinheiro já saiu.
             </p>
           </div>
@@ -356,7 +356,7 @@ export default async function HomePage() {
                         <strong>{course.title}</strong>
                       </React.Fragment>
                     ))}{' '}
-                    recebe, sem pagar nada a mais, o curso <strong>{bonus.title}</strong> — liberado
+                    recebe, sem pagar nada a mais, o curso <strong>{bonus.title}</strong>, liberado
                     automaticamente na sua conta.
                   </p>
                 </div>
@@ -465,7 +465,7 @@ export default async function HomePage() {
 
               <p className="mt-5 leading-relaxed text-ink-600">
                 Perícia é o trabalho de descobrir por que uma obra deu errado. Quem estuda isso sabe
-                exatamente onde os erros nascem — na leitura do projeto, no orçamento, na
+                exatamente onde os erros nascem, na leitura do projeto, no orçamento, na
                 responsabilidade que ninguém percebeu que estava assumindo.
               </p>
               <p className="mt-4 leading-relaxed text-ink-600">

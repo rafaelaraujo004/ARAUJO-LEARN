@@ -28,7 +28,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-brand-950/85 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" aria-label="ARAÚJO LEARN — página inicial" className="shrink-0">
+        <Link href="/" aria-label="ARAÚJO LEARN, página inicial" className="shrink-0">
           <Logo variant="light" />
         </Link>
 

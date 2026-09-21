@@ -104,7 +104,7 @@ export function CourseCta({
           <div className="flex flex-col gap-3">
             <Alert tone="success" title="Pedido registrado" icon={<Clock3 className="size-4" />}>
               {state.message ??
-                'Seu pedido está com o tutor. Combine o pagamento pelo WhatsApp — o acesso é liberado logo após a confirmação.'}
+                'Seu pedido está com o tutor. Combine o pagamento pelo WhatsApp, o acesso é liberado logo após a confirmação.'}
             </Alert>
             {waLink && (
               <ButtonLink href={waLink} variant="accent" size="lg" target="_blank" block>
@@ -164,12 +164,12 @@ export function CourseCta({
                 {[
                   {
                     value: 'pix',
-                    label: `PIX — ${formatPrice(pixPrice(priceCents, pixDiscountPercent))}`,
+                    label: `PIX: ${formatPrice(pixPrice(priceCents, pixDiscountPercent))}`,
                     hint: `${pixDiscountPercent}% de desconto`,
                   },
                   {
                     value: 'cartao',
-                    label: `Cartão — até ${maxInstallments}x de ${formatPrice(
+                    label: `Cartão: até ${maxInstallments}x de ${formatPrice(
                       installmentPrice(priceCents, maxInstallments),
                     )}`,
                     hint: 'parcelado no crédito',
@@ -198,7 +198,7 @@ export function CourseCta({
               </div>
             </fieldset>
           ) : (
-            <Badge tone="accent">Curso bônus — sem custo adicional</Badge>
+            <Badge tone="accent">Curso bônus, sem custo adicional</Badge>
           )}
 
           <Textarea

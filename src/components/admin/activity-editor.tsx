@@ -453,7 +453,7 @@ function QuestionDialog({
             <legend className="mb-2 text-sm font-medium text-ink-700">
               Alternativas{' '}
               <span className="font-normal text-ink-500">
-                —{' '}
+                
                 {type === 'MULTIPLE_CHOICE'
                   ? 'marque todas as corretas'
                   : 'marque a alternativa correta'}
@@ -525,7 +525,7 @@ function QuestionDialog({
           rows={2}
           value={explanation}
           onChange={(event) => setExplanation(event.target.value)}
-          hint="Opcional. O aluno lê depois de enviar — é aqui que ele aprende com o erro."
+          hint="Opcional. O aluno lê depois de enviar, é aqui que ele aprende com o erro."
         />
       </div>
     </Modal>

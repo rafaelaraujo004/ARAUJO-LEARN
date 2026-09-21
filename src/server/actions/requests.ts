@@ -89,7 +89,7 @@ export async function requestEnrollmentAction(
   return {
     ok: true,
     message:
-      'Pedido registrado. Combine o pagamento com o tutor pelo WhatsApp — assim que ele confirmar, seu acesso é liberado.',
+      'Pedido registrado. Combine o pagamento com o tutor pelo WhatsApp, assim que ele confirmar, seu acesso é liberado.',
   };
 }
 

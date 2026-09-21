@@ -62,9 +62,9 @@ export default async function CourseActivitiesPage({
     isPublished: activity.isPublished,
     questionCount: activity._count.questions,
     scopeLabel: activity.lessonId
-      ? `Aula: ${lessonTitle.get(activity.lessonId) ?? '—'}`
+      ? `Aula: ${lessonTitle.get(activity.lessonId) ?? 'Sem registro'}`
       : activity.moduleId
-        ? `Módulo: ${moduleTitle.get(activity.moduleId) ?? '—'}`
+        ? `Módulo: ${moduleTitle.get(activity.moduleId) ?? 'Sem registro'}`
         : 'Final do curso',
   }));
 

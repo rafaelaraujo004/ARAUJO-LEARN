@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { SiteHeader } from '@/components/site/header';
 import { SiteFooter } from '@/components/site/footer';
 import { StudentNav } from '@/components/student/nav';
+import { PasswordNotice } from '@/components/auth/password-notice';
 import { requireUser } from '@/server/auth/guards';
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
         Pular para o conteúdo
       </a>
       <SiteHeader user={user} />
+      {user.mustChangePassword && <PasswordNotice />}
       <StudentNav />
       <main id="conteudo" className="flex-1 bg-ink-50">
         {children}

@@ -89,9 +89,9 @@ const COURSES: CourseSeed[] = [
     shortDescription:
       'Leia qualquer prancha com segurança e pare de depender de terceiros para entender um projeto.',
     description:
-      'Projeto mal lido vira retrabalho, prejuízo e discussão no canteiro. Este curso ensina você a percorrer um projeto completo — arquitetônico, estrutural e complementares — entendendo o que cada linha, cota e símbolo está dizendo.\n\nO que separa quem "sabe mais ou menos" de quem tem segurança é o método. Você aprende a ordem certa de leitura, os pontos onde quase todo mundo erra e como encontrar incompatibilidades antes que virem custo.\n\nNo fim, você pega um projeto que nunca viu e sabe exatamente o que ele pede: como executar, o que perguntar ao projetista e o que levantar para orçar.',
+      'Projeto mal lido vira retrabalho, prejuízo e discussão no canteiro. Este curso ensina você a percorrer um projeto completo, arquitetônico, estrutural e complementares, entendendo o que cada linha, cota e símbolo está dizendo.\n\nO que separa quem "sabe mais ou menos" de quem tem segurança é o método. Você aprende a ordem certa de leitura, os pontos onde quase todo mundo erra e como encontrar incompatibilidades antes que virem custo.\n\nNo fim, você pega um projeto que nunca viu e sabe exatamente o que ele pede: como executar, o que perguntar ao projetista e o que levantar para orçar.',
     objective:
-      'Ler e interpretar, com autonomia, projetos arquitetônicos, estruturais e complementares — identificando escalas, cotas, simbologia, incompatibilidades e as informações necessárias para executar e orçar a obra.',
+      'Ler e interpretar, com autonomia, projetos arquitetônicos, estruturais e complementares, identificando escalas, cotas, simbologia, incompatibilidades e as informações necessárias para executar e orçar a obra.',
     audience:
       'Engenheiros e arquitetos em início de carreira, técnicos em edificações, estudantes, mestres de obra, encarregados e profissionais de orçamento que precisam entender projeto sem depender de terceiros.',
     level: 'BEGINNER',
@@ -105,11 +105,11 @@ const COURSES: CourseSeed[] = [
         lessons: [
           {
             title: 'Como um projeto se comunica',
-            description: 'O que o desenho técnico é — e o que ele nunca diz explicitamente.',
+            description: 'O que o desenho técnico é, e o que ele nunca diz explicitamente.',
             minutes: 25,
             preview: true,
             content:
-              '## Projeto é linguagem, não desenho\n\nUm projeto de engenharia não é uma ilustração da obra: é um **documento técnico** que comunica decisões. Toda linha tem intenção, e quase nada está ali por estética.\n\nTrês perguntas guiam a leitura de qualquer prancha:\n\n1. **O que estou vendo?** — planta, corte, vista, detalhe.\n2. **De onde estou olhando?** — o plano de corte e o sentido de observação mudam tudo.\n3. **Em que escala?** — a mesma parede pode ser um traço ou um detalhe construtivo completo.\n\n> Quem pula a pergunta 2 interpreta corte como fachada. É o erro mais comum de quem está começando — e o mais caro.\n\n### O que o projeto NÃO diz\n\nO projeto entrega geometria e especificação. Ele não entrega **sequência executiva**, **produtividade** nem **custo**. Essas informações você constrói a partir da leitura — e é isso que este curso ensina.',
+              '## Projeto é linguagem, não desenho\n\nUm projeto de engenharia não é uma ilustração da obra: é um **documento técnico** que comunica decisões. Toda linha tem intenção, e quase nada está ali por estética.\n\nTrês perguntas guiam a leitura de qualquer prancha:\n\n1. **O que estou vendo?**: planta, corte, vista, detalhe.\n2. **De onde estou olhando?**: o plano de corte e o sentido de observação mudam tudo.\n3. **Em que escala?**: a mesma parede pode ser um traço ou um detalhe construtivo completo.\n\n> Quem pula a pergunta 2 interpreta corte como fachada. É o erro mais comum de quem está começando, e o mais caro.\n\n### O que o projeto NÃO diz\n\nO projeto entrega geometria e especificação. Ele não entrega **sequência executiva**, **produtividade** nem **custo**. Essas informações você constrói a partir da leitura, e é isso que este curso ensina.',
           },
           {
             title: 'Normas e convenções: NBR 6492 e NBR 8196',
@@ -121,7 +121,7 @@ const COURSES: CourseSeed[] = [
             description: 'Escala gráfica, escala numérica e o cuidado com pranchas impressas.',
             minutes: 28,
             content:
-              '## A escala é um contrato\n\nQuando a prancha informa **1:50**, cada centímetro no papel representa 50 cm na obra. Parece óbvio, mas dois detalhes derrubam muita gente:\n\n- **Impressão fora de escala.** Uma prancha A1 impressa em A3 mantém a proporção, mas não a medida absoluta. Por isso existe a **escala gráfica**: ela encolhe junto com o desenho.\n- **Escalas diferentes na mesma prancha.** É normal a planta estar em 1:50 e o detalhe de fundação em 1:20. Confira o selo de cada desenho, não o da prancha.\n\n### Regra prática\n\n**Nunca meça com régua para tomar decisão de obra.** Use a cota. A régua serve para conferir se a cota faz sentido — não para substituí-la.',
+              '## A escala é um contrato\n\nQuando a prancha informa **1:50**, cada centímetro no papel representa 50 cm na obra. Parece óbvio, mas dois detalhes derrubam muita gente:\n\n- **Impressão fora de escala.** Uma prancha A1 impressa em A3 mantém a proporção, mas não a medida absoluta. Por isso existe a **escala gráfica**: ela encolhe junto com o desenho.\n- **Escalas diferentes na mesma prancha.** É normal a planta estar em 1:50 e o detalhe de fundação em 1:20. Confira o selo de cada desenho, não o da prancha.\n\n### Regra prática\n\n**Nunca meça com régua para tomar decisão de obra.** Use a cota. A régua serve para conferir se a cota faz sentido, não para substituí-la.',
           },
           {
             title: 'Cotas, níveis e amarrações',
@@ -151,7 +151,7 @@ const COURSES: CourseSeed[] = [
           },
           {
             title: 'Quadro de esquadrias e de áreas',
-            description: 'As tabelas que resumem o projeto — e que quase ninguém lê.',
+            description: 'As tabelas que resumem o projeto, e que quase ninguém lê.',
             minutes: 22,
           },
         ],
@@ -196,7 +196,7 @@ const COURSES: CourseSeed[] = [
             description: 'Um roteiro para não deixar nada passar.',
             minutes: 24,
             content:
-              '## Roteiro de leitura\n\nUse esta ordem sempre que receber um projeto novo. Ela evita que você tome decisões com informação pela metade.\n\n1. **Selo e revisão** — você está com a versão mais recente?\n2. **Lista de pranchas** — o conjunto está completo?\n3. **Implantação e locação** — onde a obra fica no terreno.\n4. **Plantas baixas** — organização e fluxos.\n5. **Cortes** — alturas, níveis e escadas.\n6. **Estrutural** — pilares, vigas e fundação.\n7. **Complementares** — elétrica e hidrossanitário.\n8. **Compatibilização** — o que conflita entre as disciplinas.\n9. **Quadros e memoriais** — especificações e acabamentos.\n\n> Anote toda dúvida enquanto lê. Dúvida anotada vira pergunta ao projetista; dúvida esquecida vira retrabalho na obra.',
+              '## Roteiro de leitura\n\nUse esta ordem sempre que receber um projeto novo. Ela evita que você tome decisões com informação pela metade.\n\n1. **Selo e revisão**: você está com a versão mais recente?\n2. **Lista de pranchas**: o conjunto está completo?\n3. **Implantação e locação**: onde a obra fica no terreno.\n4. **Plantas baixas**: organização e fluxos.\n5. **Cortes**: alturas, níveis e escadas.\n6. **Estrutural**: pilares, vigas e fundação.\n7. **Complementares**: elétrica e hidrossanitário.\n8. **Compatibilização**: o que conflita entre as disciplinas.\n9. **Quadros e memoriais**: especificações e acabamentos.\n\n> Anote toda dúvida enquanto lê. Dúvida anotada vira pergunta ao projetista; dúvida esquecida vira retrabalho na obra.',
           },
         ],
       },
@@ -208,7 +208,7 @@ const COURSES: CourseSeed[] = [
     shortDescription:
       'Monte orçamentos que fecham a conta: quantitativos, composições, BDI, curva ABC e cronograma.',
     description:
-      'Orçamento errado não aparece no dia em que é feito. Aparece meses depois, quando o dinheiro acaba. Este curso ensina o método completo do orçamento preliminar de obras civis, do levantamento de quantitativos até a planilha que você apresenta ao cliente.\n\nVocê aprende a usar as fontes oficiais de preço (SINAPI e similares), a montar composições de custo, a calcular o BDI sem inventar percentual e a usar a curva ABC para saber onde o orçamento realmente se decide.\n\nO resultado: propostas que você consegue defender número por número — e que não deixam prejuízo escondido.',
+      'Orçamento errado não aparece no dia em que é feito. Aparece meses depois, quando o dinheiro acaba. Este curso ensina o método completo do orçamento preliminar de obras civis, do levantamento de quantitativos até a planilha que você apresenta ao cliente.\n\nVocê aprende a usar as fontes oficiais de preço (SINAPI e similares), a montar composições de custo, a calcular o BDI sem inventar percentual e a usar a curva ABC para saber onde o orçamento realmente se decide.\n\nO resultado: propostas que você consegue defender número por número, e que não deixam prejuízo escondido.',
     objective:
       'Elaborar um orçamento preliminar completo de uma obra civil: levantar quantitativos a partir do projeto, compor custos unitários, aplicar BDI, montar a planilha orçamentária, a curva ABC e o cronograma físico-financeiro.',
     audience:
@@ -287,7 +287,7 @@ const COURSES: CourseSeed[] = [
             description: 'Administração central, risco, lucro e tributos.',
             minutes: 45,
             content:
-              '## BDI não é "um número que se usa"\n\nBDI (Benefícios e Despesas Indiretas) é **calculado**, não escolhido. A fórmula consolidada pelo Acórdão TCU 2622/2013 é a referência mais usada:\n\n```\nBDI = [ (1+AC+S+R+G) × (1+DF) × (1+L) ] / (1 - I) - 1\n```\n\nOnde:\n\n- **AC** — administração central\n- **S** — seguros\n- **R** — riscos\n- **G** — garantias\n- **DF** — despesas financeiras\n- **L** — lucro\n- **I** — tributos sobre o faturamento\n\n### O erro clássico\n\nIncluir no BDI um custo que já está na composição — ou o contrário. **Administração local de obra é custo direto**, não BDI. Contar duas vezes infla o preço e derruba a proposta; não contar nenhuma vez come o lucro.',
+              '## BDI não é "um número que se usa"\n\nBDI (Benefícios e Despesas Indiretas) é **calculado**, não escolhido. A fórmula consolidada pelo Acórdão TCU 2622/2013 é a referência mais usada:\n\n```\nBDI = [ (1+AC+S+R+G) × (1+DF) × (1+L) ] / (1 - I) - 1\n```\n\nOnde:\n\n- **AC**: administração central\n- **S**: seguros\n- **R**: riscos\n- **G**: garantias\n- **DF**: despesas financeiras\n- **L**: lucro\n- **I**: tributos sobre o faturamento\n\n### O erro clássico\n\nIncluir no BDI um custo que já está na composição, ou o contrário. **Administração local de obra é custo direto**, não BDI. Contar duas vezes infla o preço e derruba a proposta; não contar nenhuma vez come o lucro.',
           },
         ],
       },
@@ -325,11 +325,11 @@ const COURSES: CourseSeed[] = [
     shortDescription:
       'Entenda ART, atribuições e responsabilidade técnica antes que um erro custe caro.',
     description:
-      'Bônus liberado automaticamente para quem leva os dois cursos da formação.\n\nBoa parte dos problemas graves em obra não é técnica: é de responsabilidade. Quem assina o quê, qual atribuição cada profissional tem, quando a ART é obrigatória e o que acontece quando ela não existe.\n\nVocê termina sabendo exatamente o tamanho da responsabilidade que assume — e como se proteger.',
+      'Bônus liberado automaticamente para quem leva os dois cursos da formação.\n\nBoa parte dos problemas graves em obra não é técnica: é de responsabilidade. Quem assina o quê, qual atribuição cada profissional tem, quando a ART é obrigatória e o que acontece quando ela não existe.\n\nVocê termina sabendo exatamente o tamanho da responsabilidade que assume, e como se proteger.',
     objective:
       'Entender o Sistema CONFEA/CREA, emitir e interpretar ART corretamente, conhecer as atribuições profissionais e as obrigações legais que cercam uma obra.',
     audience:
-      'Todo profissional que assina, executa, fiscaliza ou orça obra — e precisa saber exatamente o tamanho da responsabilidade que está assumindo.',
+      'Todo profissional que assina, executa, fiscaliza ou orça obra, e precisa saber exatamente o tamanho da responsabilidade que está assumindo.',
     level: 'BEGINNER',
     durationMinutes: 240,
     priceCents: null,
@@ -354,7 +354,7 @@ const COURSES: CourseSeed[] = [
             description: 'Tipos de ART, prazo de registro e consequências da ausência.',
             minutes: 35,
             content:
-              '## A ART não é burocracia\n\nA Anotação de Responsabilidade Técnica é o documento que **vincula um profissional a um serviço técnico**. Sem ela, do ponto de vista do CREA, o serviço não tem responsável — e quem executou está em exercício irregular.\n\n### Pontos que geram mais dúvida\n\n- **Prazo:** a ART deve ser registrada **antes** do início da atividade.\n- **Alteração x baixa:** mudou escopo, registra aditivo; terminou, dá baixa.\n- **Obra com vários profissionais:** cada um registra a ART da sua parte. Não existe "ART que cobre todo mundo".\n\n> A ART também é o que alimenta o seu **acervo técnico**. Profissional que não registra ART chega na hora de provar experiência sem nada na mão.',
+              '## A ART não é burocracia\n\nA Anotação de Responsabilidade Técnica é o documento que **vincula um profissional a um serviço técnico**. Sem ela, do ponto de vista do CREA, o serviço não tem responsável, e quem executou está em exercício irregular.\n\n### Pontos que geram mais dúvida\n\n- **Prazo:** a ART deve ser registrada **antes** do início da atividade.\n- **Alteração x baixa:** mudou escopo, registra aditivo; terminou, dá baixa.\n- **Obra com vários profissionais:** cada um registra a ART da sua parte. Não existe "ART que cobre todo mundo".\n\n> A ART também é o que alimenta o seu **acervo técnico**. Profissional que não registra ART chega na hora de provar experiência sem nada na mão.',
           },
           {
             title: 'Atribuições profissionais: o que você pode assinar',
@@ -417,7 +417,7 @@ async function main() {
   const bio =
     'Engenheiro Civil, mestre em Perícia e Avaliação de Engenharia e MBA em Gestão de Projetos. ' +
     'Ensino a partir do que a prática cobra: leitura de projeto, orçamento e responsabilidade técnica. ' +
-    'Minha régua é simples — a aula só presta se você conseguir aplicar na sua obra no dia seguinte.';
+    'Minha régua é simples, a aula só presta se você conseguir aplicar na sua obra no dia seguinte.';
 
   const tutor = await db.user.upsert({
     where: { email: TUTOR_EMAIL },
@@ -428,6 +428,7 @@ async function main() {
       name: 'Eng. Amilton Araújo',
       email: TUTOR_EMAIL,
       passwordHash: await hashPassword(TUTOR_PASSWORD),
+      mustChangePassword: process.env.SEED_TUTOR_MUST_CHANGE === '1',
       role: 'ADMIN',
       headline:
         'Engenheiro Civil · MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de Projetos',
@@ -445,7 +446,7 @@ async function main() {
       'Atuação em projetos, orçamento, perícia e avaliação de obras civis, além de formação de ' +
       'profissionais e equipes técnicas.',
     methodology:
-      'Aula direta, exemplo real de obra e aplicação imediata. Cada módulo termina com uma tarefa prática, para você sair aplicando o que aprendeu — e não só assistindo.',
+      'Aula direta, exemplo real de obra e aplicação imediata. Cada módulo termina com uma tarefa prática, para você sair aplicando o que aprendeu, e não só assistindo.',
     specialties: [
       'Leitura de projetos',
       'Orçamento de obras',
@@ -499,7 +500,7 @@ async function main() {
 
     const existingModules = await db.module.count({ where: { courseId: course.id } });
     if (existingModules > 0) {
-      console.log(`[seed] "${seed.title}" já tem módulos — estrutura preservada.`);
+      console.log(`[seed] "${seed.title}" já tem módulos, estrutura preservada.`);
       continue;
     }
 
@@ -532,7 +533,7 @@ async function main() {
 
     const lessonTotal = seed.modules.reduce((total, m) => total + m.lessons.length, 0);
     console.log(
-      `[seed] "${seed.title}" — ${seed.modules.length} módulos, ${lessonTotal} aulas.`,
+      `[seed] "${seed.title}", ${seed.modules.length} módulos, ${lessonTotal} aulas.`,
     );
   }
 
@@ -585,7 +586,7 @@ async function main() {
         options: [
           { text: 'Nada muda: a escala 1:50 continua válida com régua', isCorrect: false },
           {
-            text: 'A proporção se mantém, mas a escala numérica não vale mais — use a escala gráfica ou a cota',
+            text: 'A proporção se mantém, mas a escala numérica não vale mais, use a escala gráfica ou a cota',
             isCorrect: true,
           },
           { text: 'O desenho fica distorcido e não pode ser usado', isCorrect: false },
@@ -639,7 +640,7 @@ async function main() {
   }
 
   // ------------------------------------------------------ Aluno de teste
-  await db.user.upsert({
+  if (process.env.SEED_SKIP_STUDENT !== '1') await db.user.upsert({
     where: { email: STUDENT_EMAIL },
     update: {},
     create: {
@@ -651,8 +652,8 @@ async function main() {
   });
 
   console.log('\n[seed] pronto.');
-  console.log(`  tutor  → ${TUTOR_EMAIL} / ${TUTOR_PASSWORD}`);
-  console.log(`  aluno  → ${STUDENT_EMAIL} / ${STUDENT_PASSWORD}`);
+  console.log(`  tutor  → ${TUTOR_EMAIL}`);
+  if (process.env.SEED_SKIP_STUDENT !== '1') console.log(`  aluno  → ${STUDENT_EMAIL}`);
 }
 
 main()

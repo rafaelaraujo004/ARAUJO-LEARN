@@ -22,7 +22,7 @@ export async function renderCertificatePdf(data: CertificateData): Promise<Buffe
   const { PDFDocument, StandardFonts, rgb, degrees } = await import('pdf-lib');
 
   const pdf = await PDFDocument.create();
-  pdf.setTitle(`Certificado ${data.code} — ${data.courseTitle}`);
+  pdf.setTitle(`Certificado ${data.code}, ${data.courseTitle}`);
   pdf.setAuthor('ARAÚJO LEARN');
   pdf.setSubject(`Certificado de conclusão: ${data.courseTitle}`);
   pdf.setProducer('ARAÚJO LEARN');

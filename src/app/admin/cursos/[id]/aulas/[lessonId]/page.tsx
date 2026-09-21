@@ -18,7 +18,7 @@ export async function generateMetadata({
 }) {
   const { lessonId } = await params;
   const lesson = await db.lesson.findUnique({ where: { id: lessonId }, select: { title: true } });
-  return { title: lesson ? `${lesson.title} — aula` : 'Aula' };
+  return { title: lesson ? `${lesson.title}, aula` : 'Aula' };
 }
 
 export default async function EditLessonPage({

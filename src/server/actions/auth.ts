@@ -204,7 +204,7 @@ export async function resetAction(_prev: FormState, formData: FormData): Promise
   await db.$transaction([
     db.user.update({
       where: { id: record.userId },
-      data: { passwordHash: await hashPassword(parsed.data.password) },
+      data: { passwordHash: await hashPassword(parsed.data.password), mustChangePassword: false },
     }),
     db.passwordResetToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
   ]);
@@ -268,7 +268,7 @@ export async function changePasswordAction(
 
   await db.user.update({
     where: { id: current.id },
-    data: { passwordHash: await hashPassword(parsed.data.password) },
+    data: { passwordHash: await hashPassword(parsed.data.password), mustChangePassword: false },
   });
   await destroyAllSessions(current.id);
 

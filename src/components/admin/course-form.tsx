@@ -36,8 +36,8 @@ const LEVELS = [
 ];
 
 const ACCESS = [
-  { value: 'RESTRICTED', label: 'Restrito — liberado por você após o pagamento' },
-  { value: 'FREE', label: 'Aberto — qualquer aluno cadastrado entra sozinho' },
+  { value: 'RESTRICTED', label: 'Restrito: liberado por você após o pagamento' },
+  { value: 'FREE', label: 'Aberto: qualquer aluno cadastrado entra sozinho' },
 ];
 
 export function CourseForm({ course }: { course?: CourseFormValues }) {
@@ -150,7 +150,7 @@ export function CourseForm({ course }: { course?: CourseFormValues }) {
             name="audience"
             rows={3}
             defaultValue={course?.audience}
-            hint="Ajuda o aluno certo a se reconhecer — e o errado a não se frustrar."
+            hint="Ajuda o aluno certo a se reconhecer, e o errado a não se frustrar."
           />
         </div>
       </Card>

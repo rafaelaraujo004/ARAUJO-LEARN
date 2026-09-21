@@ -217,7 +217,7 @@ export default async function TutorPage() {
             <p className="mt-3 leading-relaxed text-ink-600">
               Cada aula nasce de situações reais: projeto que não bate, orçamento que estourou,
               responsabilidade assumida sem saber. O que você aprende aqui é o que funciona no
-              canteiro — e não só no papel.
+              canteiro, e não só no papel.
             </p>
           </div>
         </section>

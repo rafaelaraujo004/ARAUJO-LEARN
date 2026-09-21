@@ -250,7 +250,7 @@ export default async function StudentDashboardPage() {
                   {pluralize(availableCourses, 'outro curso disponível', 'outros cursos disponíveis')}
                 </p>
                 <p className="mt-0.5 text-sm text-ink-500">
-                  Amplie sua formação — e garanta o curso bônus ao ter os dois cursos.
+                  Amplie sua formação, e garanta o curso bônus ao ter os dois cursos.
                 </p>
               </div>
               <ButtonLink href="/cursos" variant="secondary">

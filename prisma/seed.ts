@@ -436,9 +436,7 @@ async function main() {
       'Atuação em projetos, orçamento, perícia e avaliação de obras civis, além de formação de ' +
       'profissionais e equipes técnicas.',
     methodology:
-      'Aula direta, exemplo real de obra e aplicação imediata. Cada módulo termina com uma tarefa ' +
-      'prática, e o aluno tem canal aberto com o tutor durante toda a formação — inclusive para ' +
-      'levar dúvidas dos próprios projetos e orçamentos que está enfrentando no trabalho.',
+      'Aula direta, exemplo real de obra e aplicação imediata. Cada módulo termina com uma tarefa prática, para você sair aplicando o que aprendeu — e não só assistindo.',
     specialties: [
       'Leitura de projetos',
       'Orçamento de obras',

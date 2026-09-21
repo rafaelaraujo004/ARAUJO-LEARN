@@ -5,6 +5,7 @@ import { storage } from '@/server/storage';
 import { keys } from '@/server/storage/keys';
 import { env } from '@/lib/env';
 import { renderCertificatePdf } from '@/server/certificate-pdf';
+import { CERTIFICATE_ALPHABET } from '@/lib/certificate-code';
 
 /**
  * Certificados.
@@ -17,12 +18,10 @@ import { renderCertificatePdf } from '@/server/certificate-pdf';
  * espaço enquanto ninguém baixar.
  */
 
-// Sem I, O, 0 e 1: evita erro de digitação na validação pública.
-const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function randomBlock(size: number): string {
   let out = '';
-  for (let i = 0; i < size; i += 1) out += ALPHABET[randomInt(ALPHABET.length)];
+  for (let i = 0; i < size; i += 1) out += CERTIFICATE_ALPHABET[randomInt(CERTIFICATE_ALPHABET.length)];
   return out;
 }
 

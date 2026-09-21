@@ -5,6 +5,19 @@ import { ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/primitives';
 import { db } from '@/server/db';
 import { formatDate } from '@/lib/utils';
+import { isValidCertificateCode, normalizeCertificateCode } from '@/lib/certificate-code';
+
+/** `decodeURIComponent` lança em URL malformada (ex.: %E0%A4%A); aqui nunca derruba a página. */
+function readCode(raw: string): string {
+  let decoded = raw;
+  try {
+    decoded = decodeURIComponent(raw);
+  } catch {
+    // mantém o texto original: vira "não encontrado" mais abaixo
+  }
+  // Limita o tamanho: o valor é exibido de volta na tela.
+  return normalizeCertificateCode(decoded).slice(0, 24);
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +28,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { code } = await params;
   return {
-    title: `Certificado ${code.toUpperCase()}`,
+    title: `Certificado ${readCode(code)}`,
     description: 'Validação de certificado da ARAÚJO LEARN.',
   };
 }
@@ -32,9 +45,12 @@ export default async function ValidateCodePage({
   params: Promise<{ code: string }>;
 }) {
   const { code } = await params;
-  const normalized = decodeURIComponent(code).trim().toUpperCase();
+  const normalized = readCode(code);
 
-  const certificate = await db.certificate.findUnique({
+  // Formato impossível: nem consulta o banco.
+  const certificate = !isValidCertificateCode(normalized)
+    ? null
+    : await db.certificate.findUnique({
     where: { code: normalized },
     select: {
       code: true,

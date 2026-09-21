@@ -37,6 +37,19 @@ function bool(name: string, fallback: boolean): boolean {
 const isProduction = process.env.NODE_ENV === 'production';
 
 /**
+ * Driver de storage: se as credenciais do bucket existem, usa o bucket.
+ * Só cai no disco local quando não há credenciais — ou quando o driver 'local'
+ * é pedido explicitamente. Evita o erro clássico de esquecer STORAGE_DRIVER em
+ * produção e gravar vídeos em disco efêmero, que some a cada deploy.
+ */
+const hasBucketCredentials = Boolean(
+  (process.env.S3_ENDPOINT || process.env.AWS_ENDPOINT_URL) &&
+    (process.env.S3_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID) &&
+    (process.env.S3_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY),
+);
+const explicitDriver = process.env.STORAGE_DRIVER as 's3' | 'local' | undefined;
+
+/**
  * Em produção o segredo é obrigatório. Em desenvolvimento usamos um valor fixo
  * para que `npm run dev` funcione sem configuração — nunca em produção.
  */
@@ -53,12 +66,14 @@ export const env = {
   },
 
   storage: {
-    driver: (optional('STORAGE_DRIVER', 'local') as 's3' | 'local'),
-    endpoint: optional('S3_ENDPOINT'),
-    region: optional('S3_REGION', 'auto'),
-    bucket: optional('S3_BUCKET', 'araujo-learn'),
-    accessKeyId: optional('S3_ACCESS_KEY_ID'),
-    secretAccessKey: optional('S3_SECRET_ACCESS_KEY'),
+    driver: explicitDriver ?? (hasBucketCredentials ? 's3' : 'local'),
+    // Aceita os nomes S3_* e também os que o Railway Storage Bucket injeta
+    // (AWS_*): dá para apontar as variáveis do serviço direto para o bucket.
+    endpoint: optional('S3_ENDPOINT') || optional('AWS_ENDPOINT_URL'),
+    region: optional('S3_REGION') || optional('AWS_DEFAULT_REGION', 'auto'),
+    bucket: optional('S3_BUCKET') || optional('AWS_S3_BUCKET_NAME', 'araujo-learn'),
+    accessKeyId: optional('S3_ACCESS_KEY_ID') || optional('AWS_ACCESS_KEY_ID'),
+    secretAccessKey: optional('S3_SECRET_ACCESS_KEY') || optional('AWS_SECRET_ACCESS_KEY'),
     forcePathStyle: bool('S3_FORCE_PATH_STYLE', true),
     signedUrlTtl: int('SIGNED_URL_TTL', 900),
   },

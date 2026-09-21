@@ -194,7 +194,7 @@ export function CourseForm({ course }: { course?: CourseFormValues }) {
             name="includes"
             rows={4}
             defaultValue={(course?.includes ?? []).join('\n')}
-            hint="Um item por linha. Ex.: Apostila completa / Certificado de conclusão / Interação direta com o tutor"
+            hint="Um item por linha. Ex.: Apostila completa / Certificado de conclusão / Suporte para tirar dúvidas"
           />
 
           <Switch

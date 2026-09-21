@@ -20,7 +20,10 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "dev:db": "tsx scripts/dev-db.ts"
+    "dev:db": "tsx scripts/dev-db.ts",
+    "postinstall": "prisma generate",
+    "audit:actions": "node tools/audit-actions.mjs",
+    "verify": "npm run audit:actions && npm run lint && npm run typecheck && npm test"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

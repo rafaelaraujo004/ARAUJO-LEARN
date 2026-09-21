@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { LocalStorage, verifyLocalUrl } from '@/server/storage/local';
 import { fail, route } from '@/server/api';
+import { storageDriverName } from '@/server/storage';
 
 /**
  * Endpoint do driver de armazenamento local (desenvolvimento).
@@ -20,6 +21,8 @@ export const dynamic = 'force-dynamic';
 const local = new LocalStorage();
 
 function guard(request: NextRequest) {
+  // Com bucket S3 configurado, este endpoint de desenvolvimento não deve existir.
+  if (storageDriverName() !== 'local') return null;
   const params = request.nextUrl.searchParams;
   if (!verifyLocalUrl(params)) return null;
   return params;

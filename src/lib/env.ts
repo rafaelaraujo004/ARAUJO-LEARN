@@ -37,6 +37,14 @@ function bool(name: string, fallback: boolean): boolean {
 const isProduction = process.env.NODE_ENV === 'production';
 
 /**
+ * Durante `next build` o Next importa este módulo só para analisar as páginas;
+ * as variáveis reais podem ainda nem existir (primeiro deploy). Nessa fase a
+ * exigência é relaxada. Ao INICIAR o servidor em produção, tudo continua obrigatório.
+ */
+const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+const strict = isProduction && !isBuildPhase;
+
+/**
  * Driver de storage: se as credenciais do bucket existem, usa o bucket.
  * Só cai no disco local quando não há credenciais — ou quando o driver 'local'
  * é pedido explicitamente. Evita o erro clássico de esquecer STORAGE_DRIVER em
@@ -58,10 +66,10 @@ const DEV_SECRET = 'dev-only-insecure-secret-araujo-learn-000000000000';
 export const env = {
   isProduction,
   appUrl: optional('APP_URL', 'http://localhost:3000').replace(/\/$/, ''),
-  databaseUrl: required('DATABASE_URL', isProduction ? undefined : 'postgresql://postgres:postgres@localhost:5433/araujo_learn?schema=public'),
+  databaseUrl: required('DATABASE_URL', strict ? undefined : 'postgresql://postgres:postgres@localhost:5433/araujo_learn?schema=public'),
 
   auth: {
-    secret: isProduction ? required('AUTH_SECRET') : optional('AUTH_SECRET', DEV_SECRET),
+    secret: strict ? required('AUTH_SECRET') : optional('AUTH_SECRET', DEV_SECRET),
     sessionTtlDays: int('SESSION_TTL_DAYS', 30),
   },
 

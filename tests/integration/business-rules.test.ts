@@ -68,12 +68,12 @@ suite('regras de negócio (banco real)', () => {
           ...extra,
         },
       });
-      const module = await db.module.create({ data: { courseId: course.id, title: 'M1', position: 0 } });
+      const courseModule = await db.module.create({ data: { courseId: course.id, title: 'M1', position: 0 } });
       const lessonIds: string[] = [];
       for (let i = 0; i < lessons; i += 1) {
         const lesson = await db.lesson.create({
           data: {
-            moduleId: module.id,
+            moduleId: courseModule.id,
             title: `Aula ${i + 1}`,
             slug: `aula-${i + 1}`,
             position: i,
@@ -139,6 +139,13 @@ suite('regras de negócio (banco real)', () => {
       expect((await access.lessonAccess(null, ids.previewLesson)).allowed).toBe(true);
       const blocked = await access.lessonAccess(null, ids.lessonsA[1]!);
       expect(blocked).toMatchObject({ allowed: false, reason: 'not-enrolled' });
+    });
+
+    it('aluno matriculado em aula de amostra é tratado como aluno, não como visitante', async () => {
+      await access.grantAccess(ids.student, ids.courseA);
+      const result = await access.lessonAccess(asUser(ids.student), ids.previewLesson);
+      expect(result).toMatchObject({ allowed: true, reason: 'enrolled' });
+      await db.enrollment.deleteMany({ where: { userId: ids.student, courseId: ids.courseA } });
     });
 
     it('aluno sem matrícula não acessa aula paga', async () => {

@@ -17,7 +17,8 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { cn, formatTimecode } from '@/lib/utils';
-import { PROGRESS_SAVE_INTERVAL_MS } from '@/lib/constants';
+import { LESSON_COMPLETION_THRESHOLD, PROGRESS_SAVE_INTERVAL_MS } from '@/lib/constants';
+import { resolveResumePoint } from '@/lib/resume';
 
 /**
  * Player da aula.
@@ -64,7 +65,7 @@ export function VideoPlayer({
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [buffering, setBuffering] = React.useState(true);
   const [playing, setPlaying] = React.useState(false);
-  const [current, setCurrent] = React.useState(resumeAt);
+  const [current, setCurrent] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
   const [buffered, setBuffered] = React.useState(0);
   const [volume, setVolume] = React.useState(1);
@@ -75,7 +76,19 @@ export function VideoPlayer({
   const [controlsVisible, setControlsVisible] = React.useState(true);
   const [ended, setEnded] = React.useState(false);
   const [completed, setCompleted] = React.useState(initialCompleted);
-  const [resumed, setResumed] = React.useState(resumeAt < 5);
+  // Segundo em que a reprodução foi retomada (ou null se começou do início).
+  const [resumedFrom, setResumedFrom] = React.useState<number | null>(null);
+  const didResume = React.useRef(false);
+  // Alguns arquivos (gravações do navegador, MP4 fragmentado) informam duração
+  // infinita. Nesses casos vale a duração cadastrada pelo tutor.
+  const durationRef = React.useRef(0);
+  const effectiveDuration = React.useCallback(
+    (video: HTMLVideoElement | null, fallback: number | null | undefined) =>
+      video && Number.isFinite(video.duration) && video.duration > 0
+        ? video.duration
+        : (fallback ?? 0),
+    [],
+  );
 
   const hideTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSaved = React.useRef(0);
@@ -106,11 +119,11 @@ export function VideoPlayer({
   const save = React.useCallback(
     (position: number, options: { completed?: boolean; beacon?: boolean } = {}) => {
       const video = videoRef.current;
-      const total = video?.duration;
+      const total = durationRef.current || (video && Number.isFinite(video.duration) ? video.duration : 0);
       const payload = JSON.stringify({
         lessonId,
         positionSeconds: Math.max(0, Math.floor(position)),
-        durationSeconds: Number.isFinite(total) ? Math.floor(total ?? 0) : undefined,
+        durationSeconds: total > 0 ? Math.floor(total) : undefined,
         completed: options.completed,
       });
 
@@ -294,11 +307,19 @@ export function VideoPlayer({
           onClick={togglePlay}
           onLoadedMetadata={(event) => {
             const video = event.currentTarget;
-            setDuration(video.duration || source.durationSeconds || 0);
-            if (!resumed && resumeAt > 0 && resumeAt < video.duration - 2) {
-              video.currentTime = resumeAt;
+            const total = effectiveDuration(video, source.durationSeconds);
+            durationRef.current = total;
+            setDuration(total);
+            // Só retoma uma vez, e só para um ponto que faça sentido neste vídeo.
+            if (!didResume.current) {
+              didResume.current = true;
+              const point = resolveResumePoint(resumeAt, total, LESSON_COMPLETION_THRESHOLD);
+              if (point > 0) {
+                video.currentTime = point;
+                setCurrent(point);
+                setResumedFrom(point);
+              }
             }
-            setResumed(true);
             setBuffering(false);
           }}
           onTimeUpdate={(event) => {
@@ -329,7 +350,7 @@ export function VideoPlayer({
             setPlaying(false);
             setEnded(true);
             setControlsVisible(true);
-            save(event.currentTarget.duration, { completed: true });
+            save(durationRef.current || event.currentTarget.currentTime, { completed: true });
           }}
           onError={() =>
             setLoadError('O vídeo não pôde ser carregado. Verifique sua conexão e tente de novo.')
@@ -547,9 +568,9 @@ export function VideoPlayer({
       </div>
 
       {/* Aviso de retomada */}
-      {resumeAt > 5 && !playing && !ended && current <= resumeAt + 1 && (
+      {resumedFrom !== null && !playing && !ended && current <= resumedFrom + 1 && (
         <div className="absolute top-3 left-3 rounded-lg bg-brand-950/85 px-3 py-2 text-xs font-medium text-white backdrop-blur">
-          Retomando de {formatTimecode(resumeAt)}
+          Retomando de {formatTimecode(resumedFrom)}
         </div>
       )}
     </div>

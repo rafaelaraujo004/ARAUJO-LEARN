@@ -88,9 +88,13 @@ export async function lessonAccess(
   }
 
   if (staff) return { allowed: true, reason: 'staff', courseId: course.id };
-  if (lesson.isPreview) return { allowed: true, reason: 'preview', courseId: course.id };
 
+  // A matrícula vale mais que a amostra: o aluno matriculado que abre uma aula
+  // de amostra é aluno, e não visitante (não pode ver o aviso de "amostra").
   const result = await courseAccess(user, course.id);
+  if (result.allowed) return { ...result, courseId: course.id };
+
+  if (lesson.isPreview) return { allowed: true, reason: 'preview', courseId: course.id };
   return { ...result, courseId: course.id };
 }
 

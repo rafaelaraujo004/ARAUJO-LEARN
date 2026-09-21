@@ -85,6 +85,7 @@ export function NotificationBell({ variant = 'dark' }: { variant?: 'dark' | 'lig
             'absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border bg-white shadow-lg sm:w-96',
             'animate-fade',
           )}
+          style={{ maxWidth: 'calc(100vw - 2rem)' }}
         >
           <div className="flex items-center justify-between border-b border-ink-100 px-4 py-3">
             <h3 className="text-sm font-semibold text-ink-900">Notificações</h3>

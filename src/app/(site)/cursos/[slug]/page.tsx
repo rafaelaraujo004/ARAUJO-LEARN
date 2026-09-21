@@ -142,7 +142,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                 {totals.materialCount > 0 && (
                   <Fact icon={FileText} label="Materiais" value={String(totals.materialCount)} />
                 )}
-                {course._count.enrollments >= 10 && (
+                {isStaff(user?.role) && course._count.enrollments >= 10 && (
                   <Fact icon={Users} label="Alunos" value={String(course._count.enrollments)} />
                 )}
               </dl>

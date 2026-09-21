@@ -142,7 +142,7 @@ export default async function TutorPage() {
               </ul>
             )}
 
-            <dl className="mt-10 grid max-w-md grid-cols-2 gap-6 border-t border-white/10 pt-8">
+            <dl className="mt-10 border-t border-white/10 pt-8">
               <div>
                 <dt className="sr-only">Cursos publicados</dt>
                 <dd className="font-display text-3xl font-semibold text-white tabular-nums">
@@ -153,15 +153,6 @@ export default async function TutorPage() {
                     /^\d+\s/,
                     '',
                   )}
-                </p>
-              </div>
-              <div>
-                <dt className="sr-only">Alunos matriculados</dt>
-                <dd className="font-display text-3xl font-semibold text-white tabular-nums">
-                  {tutor.studentCount}
-                </dd>
-                <p className="mt-1 text-xs text-brand-300" aria-hidden>
-                  {tutor.studentCount === 1 ? 'aluno matriculado' : 'alunos matriculados'}
                 </p>
               </div>
             </dl>

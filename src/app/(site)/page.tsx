@@ -24,7 +24,8 @@ import { getCurrentUser } from '@/server/auth/session';
 import { SITE } from '@/lib/constants';
 import { formatPrice, pixPrice, whatsappDigits } from '@/lib/utils';
 
-export const revalidate = 300;
+// Depende do banco (e do login): nunca pré-gerar no build, quando o banco ainda não está acessível.
+export const dynamic = 'force-dynamic';
 
 /** Situações que o público-alvo reconhece na própria rotina. */
 const PAINS = [

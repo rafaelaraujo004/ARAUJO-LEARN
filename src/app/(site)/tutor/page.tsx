@@ -24,8 +24,9 @@ import { featuredCourses } from '@/server/courses';
 import { getPrimaryTutor } from '@/server/tutor';
 import { pluralize, whatsappDigits } from '@/lib/utils';
 
+// Depende do banco (e do login): nunca pré-gerar no build, quando o banco ainda não está acessível.
 export const dynamic = 'force-dynamic';
-export const revalidate = 300;
+
 export async function generateMetadata(): Promise<Metadata> {
   const tutor = await getPrimaryTutor();
   if (!tutor) return { title: 'O tutor' };

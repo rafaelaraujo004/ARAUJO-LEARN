@@ -2,21 +2,29 @@
 
 import * as React from 'react';
 import { useActionState } from 'react';
-import { KeyRound, Save } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Camera, KeyRound, LogOut, Save, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input, Textarea } from '@/components/ui/field';
-import { Alert, Card, CardHeader } from '@/components/ui/primitives';
+import { Alert, Avatar, Card, CardHeader } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
-import { changePasswordAction, updateProfileAction } from '@/server/actions/auth';
+import {
+  changePasswordAction,
+  removeAvatarAction,
+  updateProfileAction,
+  uploadAvatarAction,
+} from '@/server/actions/auth';
 import { emptyFormState } from '@/lib/form-state';
 
-/** Dados pessoais e troca de senha. */
 export function AccountForms({
   profile,
+  avatarUrl,
 }: {
   profile: { name: string; email: string; headline: string; bio: string };
+  avatarUrl?: string | null;
 }) {
   const toast = useToast();
+  const router = useRouter();
   const [profileState, profileAction, profilePending] = useActionState(
     updateProfileAction,
     emptyFormState,
@@ -25,7 +33,12 @@ export function AccountForms({
     changePasswordAction,
     emptyFormState,
   );
+  const [avatarState, avatarAction, avatarPending] = useActionState(
+    uploadAvatarAction,
+    emptyFormState,
+  );
   const passwordForm = React.useRef<HTMLFormElement>(null);
+  const fileInput = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (profileState.ok && profileState.message) toast.success(profileState.message);
@@ -38,8 +51,79 @@ export function AccountForms({
     }
   }, [passwordState, toast]);
 
+  React.useEffect(() => {
+    if (avatarState.ok && avatarState.message) {
+      toast.success(avatarState.message);
+      router.refresh();
+    }
+  }, [avatarState, toast, router]);
+
+  async function handleRemoveAvatar() {
+    const result = await removeAvatarAction();
+    if (result.ok) {
+      toast.success(result.message ?? 'Foto removida.');
+      router.refresh();
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
+      {/* Foto de perfil */}
+      <Card>
+        <CardHeader title="Foto de perfil" description="Aparece ao lado do seu nome na plataforma." />
+        <div className="flex flex-wrap items-center gap-5 p-5">
+          <Avatar name={profile.name} src={avatarUrl} size={80} />
+
+          <div className="flex flex-col gap-2">
+            <form action={avatarAction}>
+              <input
+                ref={fileInput}
+                type="file"
+                name="avatar"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files?.length) {
+                    e.target.form?.requestSubmit();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                loading={avatarPending}
+                onClick={() => fileInput.current?.click()}
+              >
+                <Camera aria-hidden className="size-4" />
+                {avatarUrl ? 'Trocar foto' : 'Adicionar foto'}
+              </Button>
+            </form>
+
+            {avatarUrl && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={handleRemoveAvatar}
+              >
+                <Trash2 aria-hidden className="size-4" />
+                Remover
+              </Button>
+            )}
+          </div>
+
+          <p className="w-full text-xs text-ink-500">
+            JPG, PNG ou WebP. Até 2 MB.
+          </p>
+
+          {avatarState.message && !avatarState.ok && (
+            <Alert tone="danger" className="w-full">{avatarState.message}</Alert>
+          )}
+        </div>
+      </Card>
+
+      {/* Dados pessoais */}
       <Card>
         <CardHeader title="Dados pessoais" description="É o nome que aparece no certificado." />
         <form action={profileAction} className="flex flex-col gap-5 p-5">
@@ -88,6 +172,7 @@ export function AccountForms({
         </form>
       </Card>
 
+      {/* Senha */}
       <Card>
         <CardHeader
           title="Senha"
@@ -125,6 +210,22 @@ export function AccountForms({
             </Button>
           </div>
         </form>
+      </Card>
+
+      {/* Sair */}
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div>
+            <p className="text-sm font-semibold text-ink-900">Sair da conta</p>
+            <p className="mt-0.5 text-sm text-ink-500">Encerra esta sessão no navegador.</p>
+          </div>
+          <form action="/api/auth/logout" method="post">
+            <Button type="submit" variant="ghost" size="sm">
+              <LogOut aria-hidden className="size-4" />
+              Sair
+            </Button>
+          </form>
+        </div>
       </Card>
     </div>
   );

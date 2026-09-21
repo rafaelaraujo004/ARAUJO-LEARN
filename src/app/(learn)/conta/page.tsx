@@ -2,6 +2,7 @@ import { AccountForms } from '@/components/student/account-forms';
 import { Card, CardHeader } from '@/components/ui/primitives';
 import { db } from '@/server/db';
 import { requireUser } from '@/server/auth/guards';
+import { storage } from '@/server/storage';
 import { formatDateTime } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export default async function AccountPage() {
   const [profile, sessions] = await Promise.all([
     db.user.findUnique({
       where: { id: user.id },
-      select: { name: true, email: true, headline: true, bio: true, createdAt: true },
+      select: { name: true, email: true, headline: true, bio: true, avatarKey: true, createdAt: true },
     }),
     db.session.findMany({
       where: { userId: user.id },
@@ -24,6 +25,12 @@ export default async function AccountPage() {
   ]);
 
   if (!profile) return null;
+
+  let avatarUrl: string | null = null;
+  if (profile.avatarKey) {
+    try { avatarUrl = await storage().getSignedUrl(profile.avatarKey, { expiresIn: 60 * 60 }); }
+    catch { /* sem foto */ }
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
@@ -42,6 +49,7 @@ export default async function AccountPage() {
             headline: profile.headline ?? '',
             bio: profile.bio ?? '',
           }}
+          avatarUrl={avatarUrl}
         />
       </div>
 

@@ -4,6 +4,8 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/server/db';
+import { storage } from '@/server/storage';
+import { keys } from '@/server/storage/keys';
 import { env } from '@/lib/env';
 import { hashPassword, verifyPassword } from '@/server/auth/password';
 import {
@@ -277,4 +279,53 @@ export async function changePasswordAction(
   await setSessionCookie(token, expiresAt);
 
   return { ok: true, message: 'Senha alterada. As outras sessões foram encerradas.' };
+}
+
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+const AVATAR_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+export async function uploadAvatarAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, message: 'Sessão expirada.' };
+
+  const file = formData.get('avatar');
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, message: 'Selecione uma imagem.' };
+  }
+  if (!AVATAR_TYPES.has(file.type)) {
+    return { ok: false, message: 'Formato não aceito. Envie JPG, PNG ou WebP.' };
+  }
+  if (file.size > AVATAR_MAX_BYTES) {
+    return { ok: false, message: 'A imagem deve ter no máximo 2 MB.' };
+  }
+
+  const key = keys.avatar(user.id, file.name);
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await storage().put(key, buffer, file.type);
+
+  const old = await db.user.findUnique({ where: { id: user.id }, select: { avatarKey: true } });
+  await db.user.update({ where: { id: user.id }, data: { avatarKey: key } });
+  if (old?.avatarKey) storage().delete(old.avatarKey).catch(() => {});
+
+  revalidatePath('/conta');
+  revalidatePath('/painel');
+  return { ok: true, message: 'Foto atualizada.' };
+}
+
+export async function removeAvatarAction(): Promise<FormState> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, message: 'Sessão expirada.' };
+
+  const record = await db.user.findUnique({ where: { id: user.id }, select: { avatarKey: true } });
+  if (record?.avatarKey) {
+    await db.user.update({ where: { id: user.id }, data: { avatarKey: null } });
+    storage().delete(record.avatarKey).catch(() => {});
+  }
+
+  revalidatePath('/conta');
+  revalidatePath('/painel');
+  return { ok: true, message: 'Foto removida.' };
 }

@@ -640,16 +640,25 @@ async function main() {
   }
 
   // ------------------------------------------------------ Aluno de teste
-  if (process.env.SEED_SKIP_STUDENT !== '1') await db.user.upsert({
-    where: { email: STUDENT_EMAIL },
-    update: {},
-    create: {
-      name: 'Maria Souza',
-      email: STUDENT_EMAIL,
-      passwordHash: await hashPassword(STUDENT_PASSWORD),
-      role: 'STUDENT',
-    },
-  });
+  if (process.env.SEED_SKIP_STUDENT === '1') {
+    // Produção: remove contas de demonstração que não devem existir.
+    const demoEmails = ['aluno@araujolearn.com', 'amilton@araujolearn.com'];
+    const removed = await db.user.deleteMany({
+      where: { email: { in: demoEmails }, NOT: { email: TUTOR_EMAIL } },
+    });
+    if (removed.count) console.log(`[seed] ${removed.count} conta(s) de demonstração removida(s).`);
+  } else {
+    await db.user.upsert({
+      where: { email: STUDENT_EMAIL },
+      update: {},
+      create: {
+        name: 'Maria Souza',
+        email: STUDENT_EMAIL,
+        passwordHash: await hashPassword(STUDENT_PASSWORD),
+        role: 'STUDENT',
+      },
+    });
+  }
 
   console.log('\n[seed] pronto.');
   console.log(`  tutor  → ${TUTOR_EMAIL}`);

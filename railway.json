@@ -4,7 +4,7 @@
     "builder": "RAILPACK"
   },
   "deploy": {
-    "startCommand": "npx prisma migrate deploy && npm run start",
+    "startCommand": "npx prisma migrate deploy && node tools/bootstrap.mjs && npm run start",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 120,
     "restartPolicyType": "ON_FAILURE",

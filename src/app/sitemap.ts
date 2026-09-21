@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next';
+import { siteOrigin } from '@/lib/site-url';
 import { db } from '@/server/db';
 
-const base = (process.env.APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+const base = siteOrigin();
 
 export const dynamic = 'force-dynamic';
 

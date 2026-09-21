@@ -1,4 +1,5 @@
 import 'server-only';
+import { siteOrigin } from '@/lib/site-url';
 
 /**
  * Leitura e validação de variáveis de ambiente.
@@ -65,7 +66,7 @@ const DEV_SECRET = 'dev-only-insecure-secret-araujo-learn-000000000000';
 
 export const env = {
   isProduction,
-  appUrl: optional('APP_URL', 'http://localhost:3000').replace(/\/$/, ''),
+  appUrl: siteOrigin(process.env.APP_URL),
   databaseUrl: required('DATABASE_URL', strict ? undefined : 'postgresql://postgres:postgres@localhost:5433/araujo_learn?schema=public'),
 
   auth: {

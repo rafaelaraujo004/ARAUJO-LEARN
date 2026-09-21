@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
+import { siteOrigin } from '@/lib/site-url';
 
-const base = (process.env.APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+const base = siteOrigin();
 
 /** Só a área pública é indexada; painel, aluno, API e aulas ficam de fora. */
 export default function robots(): MetadataRoute.Robots {

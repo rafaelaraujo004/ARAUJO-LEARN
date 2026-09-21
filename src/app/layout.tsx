@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Fraunces, Inter } from 'next/font/google';
 import { SITE } from '@/lib/constants';
+import { siteUrl } from '@/lib/site-url';
 import { ToastProvider } from '@/components/ui/toast';
 import './globals.css';
 
@@ -18,7 +19,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.APP_URL ?? 'http://localhost:3000'),
+  metadataBase: siteUrl(),
   title: {
     default: `${SITE.name} — ${SITE.slogan}`,
     template: `%s · ${SITE.name}`,

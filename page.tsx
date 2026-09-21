@@ -23,6 +23,9 @@ import { CourseCard } from '@/components/course/course-card';
 import { featuredCourses } from '@/server/courses';
 import { getPrimaryTutor } from '@/server/tutor';
 import { pluralize, whatsappDigits } from '@/lib/utils';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 export const dynamic = 'force-dynamic';
 export const dynamic = 'force-dynamic';
 export const dynamic = 'force-dynamic';

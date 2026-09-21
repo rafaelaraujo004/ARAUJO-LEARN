@@ -6,7 +6,7 @@ import { LessonView } from '@/components/lesson/lesson-view';
 import { db } from '@/server/db';
 import { getCurrentUser, isStaff } from '@/server/auth/session';
 import { lessonAccess, mensagemDeBloqueio } from '@/server/access';
-import { courseOutline, getLessonForViewing, neighbours } from '@/server/lessons';
+import { courseOutline, getLessonForViewing, neighbours, scopedActivities } from '@/server/lessons';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +64,7 @@ export default async function LessonPage({
   const course = lesson.module.course;
   const staff = isStaff(user?.role);
 
-  const [modules, progress, enrollment, attempts] = await Promise.all([
+  const [modules, progress, enrollment] = await Promise.all([
     courseOutline(course.id, user?.id ?? null),
     user
       ? db.lessonProgress.findUnique({
@@ -78,21 +78,29 @@ export default async function LessonPage({
           select: { progressPercent: true },
         })
       : null,
-    user && lesson.activities.length > 0
-      ? db.activityAttempt.findMany({
-          where: {
-            userId: user.id,
-            passed: true,
-            activityId: { in: lesson.activities.map((activity) => activity.id) },
-          },
-          select: { activityId: true },
-          distinct: ['activityId'],
-        })
-      : [],
   ]);
 
-  const passedActivities = new Set(attempts.map((item) => item.activityId));
   const { previous, next, index, total } = neighbours(modules, lessonId);
+
+  const ownModule = modules.find((module) => module.id === lesson.module.id);
+  const lastInModule = ownModule?.lessons.at(-1)?.id === lessonId;
+  const lastInCourse = next === null;
+  const extra = await scopedActivities(course.id, lesson.module.id, { lastInModule, lastInCourse });
+  const allActivities = [...lesson.activities, ...extra];
+
+  // Quais dessas atividades o aluno já passou (inclui as de módulo e de curso).
+  const passed = user && allActivities.length > 0
+    ? await db.activityAttempt.findMany({
+        where: {
+          userId: user.id,
+          passed: true,
+          activityId: { in: allActivities.map((activity) => activity.id) },
+        },
+        select: { activityId: true },
+        distinct: ['activityId'],
+      })
+    : [];
+  const passedActivities = new Set(passed.map((item) => item.activityId));
 
   // Registra a aula como "última vista" para o botão Continuar aprendendo.
   if (user && !staff) {
@@ -123,7 +131,7 @@ export default async function LessonPage({
           fileName: material.media?.originalName ?? null,
           sizeBytes: material.media ? Number(material.media.sizeBytes) : null,
         })),
-        activities: lesson.activities.map((activity) => ({
+        activities: allActivities.map((activity) => ({
           id: activity.id,
           title: activity.title,
           description: activity.description,

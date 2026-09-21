@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ExternalLink, PenLine, Users } from 'lucide-react';
+import { ExternalLink, ListChecks, PenLine, Users } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/button';
 import { Badge } from '@/components/ui/primitives';
 import { ContentEditor } from '@/components/admin/content-editor';
@@ -100,6 +100,10 @@ export default async function CourseContentPage({
             <ButtonLink href={`/admin/cursos/${course.id}`} variant="secondary">
               <PenLine aria-hidden className="size-4" />
               Informações
+            </ButtonLink>
+            <ButtonLink href={`/admin/cursos/${course.id}/atividades`} variant="secondary">
+              <ListChecks aria-hidden className="size-4" />
+              Atividades
             </ButtonLink>
             <ButtonLink href={`/admin/cursos/${course.id}/alunos`} variant="secondary">
               <Users aria-hidden className="size-4" />

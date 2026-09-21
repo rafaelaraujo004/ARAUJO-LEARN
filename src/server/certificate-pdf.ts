@@ -23,9 +23,9 @@ export async function renderCertificatePdf(data: CertificateData): Promise<Buffe
 
   const pdf = await PDFDocument.create();
   pdf.setTitle(`Certificado ${data.code} — ${data.courseTitle}`);
-  pdf.setAuthor('ARAUJO LEARN');
+  pdf.setAuthor('ARAÚJO LEARN');
   pdf.setSubject(`Certificado de conclusão: ${data.courseTitle}`);
-  pdf.setProducer('ARAUJO LEARN');
+  pdf.setProducer('ARAÚJO LEARN');
 
   const page = pdf.addPage([842, 595]); // A4 paisagem
   const { width, height } = page.getSize();
@@ -66,7 +66,7 @@ export async function renderCertificatePdf(data: CertificateData): Promise<Buffe
     page.drawImage(mark, { x: 57, y: height - 69, width: 30, height: 30 });
   }
 
-  page.drawText('ARAUJO LEARN', {
+  page.drawText('ARAÚJO LEARN', {
     x: brandX,
     y: height - 56,
     size: 22,
@@ -159,7 +159,7 @@ export async function renderCertificatePdf(data: CertificateData): Promise<Buffe
   page.drawCircle({ x: width - 108, y: 104, size: 42, borderColor: gold, borderWidth: 1.5 });
   page.drawCircle({ x: width - 108, y: 104, size: 34, borderColor: gold, borderWidth: 0.6 });
   const sealSize = 9;
-  const seal = 'CONCLUIDO';
+  const seal = 'CONCLUÍDO';
   const sealWidth = sansBold.widthOfTextAtSize(seal, sealSize);
   page.drawText(seal, {
     x: width - 108 - sealWidth / 2,

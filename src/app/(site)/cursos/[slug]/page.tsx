@@ -10,7 +10,6 @@ import {
   FileText,
   Layers,
   Lock,
-  MessagesSquare,
   PlayCircle,
   Target,
   Users,
@@ -245,10 +244,6 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                   )}
 
                   <ul className="mt-5 flex flex-col gap-2 border-t border-ink-200 pt-4 text-sm text-ink-600">
-                    <li className="flex items-center gap-2">
-                      <MessagesSquare aria-hidden className="size-4 shrink-0 text-brand-500" />
-                      Suporte para tirar dúvidas durante o curso
-                    </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 aria-hidden className="size-4 shrink-0 text-progress-500" />
                       Acesso pelo celular, tablet ou computador

@@ -59,7 +59,7 @@ export function Modal({
       }}
       className={cn(
         'w-[calc(100vw-2rem)] rounded-card border border-ink-200 bg-white p-0 shadow-lift backdrop:bg-brand-950/50 backdrop:backdrop-blur-sm',
-        'my-auto max-h-[calc(100dvh-4rem)] overflow-visible',
+        'm-auto max-h-[calc(100dvh-4rem)] overflow-visible',
         widths[size],
       )}
       aria-labelledby="modal-title"

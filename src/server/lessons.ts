@@ -137,3 +137,39 @@ export async function getLessonForViewing(lessonId: string) {
     },
   });
 }
+
+/**
+ * Atividades que não pertencem a uma aula específica.
+ *
+ * Uma atividade de módulo aparece na última aula do módulo; uma atividade "de
+ * curso" (sem aula nem módulo) aparece na última aula do curso. Assim toda
+ * atividade publicada fica ao alcance do aluno no momento em que faz sentido.
+ */
+export async function scopedActivities(
+  courseId: string,
+  moduleId: string,
+  { lastInModule, lastInCourse }: { lastInModule: boolean; lastInCourse: boolean },
+) {
+  if (!lastInModule && !lastInCourse) return [];
+
+  return db.activity.findMany({
+    where: {
+      courseId,
+      isPublished: true,
+      lessonId: null,
+      OR: [
+        ...(lastInModule ? [{ moduleId }] : []),
+        ...(lastInCourse ? [{ moduleId: null }] : []),
+      ],
+    },
+    orderBy: { position: 'asc' },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      isRequired: true,
+      passingScore: true,
+      _count: { select: { questions: true } },
+    },
+  });
+}

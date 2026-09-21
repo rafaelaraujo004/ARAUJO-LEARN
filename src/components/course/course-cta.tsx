@@ -135,7 +135,8 @@ export function CourseCta({
       )}
 
       <Modal
-        open={open}
+        // Fecha sozinho quando o pedido é registrado.
+        open={open && !sent}
         onClose={() => setOpen(false)}
         title="Pedido de matrícula"
         description={title}

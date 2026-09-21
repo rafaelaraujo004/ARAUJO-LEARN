@@ -17,3 +17,6 @@ src/generated/
 .pgdata/
 .storage/
 .package-lock.registry.json
+brand/*-original.*
+certificado-exemplo.pdf
+public/certificado-exemplo.pdf

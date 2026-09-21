@@ -7,13 +7,14 @@ import {
   BookOpen,
   CheckCircle2,
   Compass,
+  AtSign,
+  Briefcase,
   GraduationCap,
-  Instagram,
-  Linkedin,
-  MessageCircle,
   Globe,
-  Users,
-  Youtube,
+  HardHat,
+  MessageCircle,
+  PlayCircle,
+  ShieldCheck,
 } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/button';
 import { Badge, Card } from '@/components/ui/primitives';
@@ -35,9 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const SOCIAL_ICONS: Record<string, { icon: React.ElementType; label: string }> = {
-  instagram: { icon: Instagram, label: 'Instagram' },
-  linkedin: { icon: Linkedin, label: 'LinkedIn' },
-  youtube: { icon: Youtube, label: 'YouTube' },
+  instagram: { icon: AtSign, label: 'Instagram' },
+  linkedin: { icon: Briefcase, label: 'LinkedIn' },
+  youtube: { icon: PlayCircle, label: 'YouTube' },
   site: { icon: Globe, label: 'Site' },
 };
 
@@ -66,8 +67,11 @@ export default async function TutorPage() {
               {tutor.photoUrl ? (
                 <img
                   src={tutor.photoUrl}
-                  alt={`Foto de ${tutor.name}`}
-                  className="aspect-[4/5] w-full object-cover"
+                  alt={`${tutor.name}, engenheiro civil`}
+                  width={900}
+                  height={966}
+                  fetchPriority="high"
+                  className="aspect-[4/4.4] w-full object-cover object-top"
                 />
               ) : (
                 <div className="grid aspect-[4/5] w-full place-items-center p-8">
@@ -112,7 +116,7 @@ export default async function TutorPage() {
 
           <div>
             <p className="text-xs font-semibold tracking-[0.14em] text-accent-300 uppercase">
-              Professor e palestrante
+              Quem vai te ensinar
             </p>
             <h1 className="mt-3 font-display text-4xl font-semibold text-white sm:text-5xl">
               {tutor.name}
@@ -192,15 +196,40 @@ export default async function TutorPage() {
           )}
         </div>
 
-        {/* Compromissos — o que o aluno pode esperar */}
+        {/* Na obra */}
+        <section className="mt-12 grid items-center gap-8 overflow-hidden rounded-card border border-ink-200 bg-white shadow-soft md:grid-cols-[0.8fr_1.2fr]">
+          <img
+            src={tutor.fieldPhotoUrl}
+            alt={`${tutor.name} em obra, de capacete`}
+            width={900}
+            height={993}
+            loading="lazy"
+            className="size-full max-h-[26rem] object-cover object-top"
+          />
+          <div className="p-6 md:py-8 md:pr-10 md:pl-2">
+            <span className="grid size-11 place-items-center rounded-xl bg-brand-900 text-accent-300">
+              <HardHat aria-hidden className="size-5.5" />
+            </span>
+            <h2 className="mt-4 font-display text-2xl font-semibold">
+              Ensina de quem já esteve na obra.
+            </h2>
+            <p className="mt-3 leading-relaxed text-ink-600">
+              Cada aula nasce de situações reais: projeto que não bate, orçamento que estourou,
+              responsabilidade assumida sem saber. O que você aprende aqui é o que funciona no
+              canteiro — e não só no papel.
+            </p>
+          </div>
+        </section>
+
+        {/* O que o aluno leva */}
         <section className="mt-12">
-          <h2 className="font-display text-2xl font-semibold">O que você pode esperar</h2>
+          <h2 className="font-display text-2xl font-semibold">O que você leva</h2>
           <ul className="mt-5 grid gap-4 sm:grid-cols-3">
             {[
               {
-                icon: Users,
-                title: 'Acompanhamento real',
-                text: 'Canal aberto com o tutor durante toda a formação, inclusive para dúvidas dos seus próprios projetos.',
+                icon: ShieldCheck,
+                title: 'Segurança para decidir',
+                text: 'Você deixa de depender de terceiros para entender um projeto ou fechar um orçamento. E, se surgir dúvida, tem a quem perguntar.',
               },
               {
                 icon: BookOpen,
@@ -228,7 +257,7 @@ export default async function TutorPage() {
         {courses.length > 0 && (
           <section className="mt-14">
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-display text-2xl font-semibold">Cursos do tutor</h2>
+              <h2 className="font-display text-2xl font-semibold">Escolha o seu curso</h2>
               <Link href="/cursos" className="text-sm font-semibold text-brand-600 hover:underline">
                 Ver catálogo completo
               </Link>
@@ -236,7 +265,7 @@ export default async function TutorPage() {
             <ul className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {courses.map((course) => (
                 <li key={course.id}>
-                  <CourseCard course={course} ctaLabel="Ver o curso" />
+                  <CourseCard course={course} ctaLabel="Quero este curso" />
                 </li>
               ))}
             </ul>
@@ -249,8 +278,8 @@ export default async function TutorPage() {
         <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
           <TutorSignature className="mx-auto" size="md" />
           <p className="mt-6 text-lg text-ink-600">
-            Ficou com dúvida sobre qual curso faz mais sentido para o seu momento? Fale comigo
-            antes de decidir.
+            Não sabe qual curso faz mais sentido para o seu momento? Me chame antes de decidir. É
+            rápido e sem compromisso.
           </p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
             {waLink && (

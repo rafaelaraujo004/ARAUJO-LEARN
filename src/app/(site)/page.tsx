@@ -1,25 +1,23 @@
 import * as React from 'react';
-import Link from 'next/link';
 import {
   ArrowRight,
   Award,
+  Calculator,
   CheckCircle2,
-  Compass,
   CreditCard,
-  FileText,
   Gift,
   MessagesSquare,
   MonitorPlay,
-  MoveUpRight,
   QrCode,
-  Sparkles,
-  Target,
+  Ruler,
+  ShieldCheck,
   TrendingUp,
-  Users,
+  X,
 } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/button';
 import { Badge } from '@/components/ui/primitives';
 import { CourseCard } from '@/components/course/course-card';
+import { TutorSignature } from '@/components/brand/logo';
 import { featuredCourses } from '@/server/courses';
 import { getPrimaryTutor } from '@/server/tutor';
 import { getCurrentUser } from '@/server/auth/session';
@@ -28,26 +26,34 @@ import { formatPrice, pixPrice, whatsappDigits } from '@/lib/utils';
 
 export const revalidate = 300;
 
-const BENEFITS = [
+/** Situações que o público-alvo reconhece na própria rotina. */
+const PAINS = [
+  'Abre o projeto e não sabe por onde começar.',
+  'Entrega o orçamento com medo de ter esquecido alguma coisa.',
+  'Assina sem ter certeza do que está assumindo.',
+  'Vê outros fechando as obras que você poderia fechar.',
+];
+
+const OUTCOMES = [
   {
-    icon: MessagesSquare,
-    title: 'Você fala com o tutor',
-    text: 'Não é videoaula solta. Durante toda a formação você tem canal aberto com o Eng. Amilton Araújo — inclusive para levar os projetos e orçamentos do seu próprio trabalho.',
+    icon: Ruler,
+    title: 'Você deixa de ter medo do projeto',
+    text: 'Cada linha, cota e símbolo passa a fazer sentido. Você enxerga a obra inteira antes de ela existir.',
   },
   {
-    icon: Target,
-    title: 'Conteúdo que vira prática',
-    text: 'Cada módulo parte de uma situação real de obra e termina com uma tarefa aplicada. O critério é um só: você conseguir usar no dia seguinte.',
+    icon: Calculator,
+    title: 'Seu orçamento passa a fechar a conta',
+    text: 'Quantitativos, composições e BDI, passo a passo. Menos chute, mais lucro.',
   },
   {
-    icon: FileText,
-    title: 'Apostila e material de apoio',
-    text: 'Você recebe apostila e material complementar para consultar depois, no escritório ou no canteiro. O conteúdo fica com você.',
+    icon: ShieldCheck,
+    title: 'Você sabe onde está pisando',
+    text: 'ART, atribuições e responsabilidade técnica explicados sem juridiquês.',
   },
   {
     icon: Award,
-    title: 'Certificação ao concluir',
-    text: 'Ao terminar, o certificado é emitido automaticamente, com código único que qualquer pessoa — ou qualquer empresa — pode conferir online.',
+    title: 'Você prova o que sabe',
+    text: 'Certificado com código único. Qualquer cliente ou empresa confere online, em segundos.',
   },
 ];
 
@@ -55,17 +61,17 @@ const METHOD = [
   {
     step: 'Aprenda',
     icon: MonitorPlay,
-    text: 'Aulas diretas ao ponto, organizadas em módulos, partindo de projetos e obras reais. Nada de teoria que não chega ao canteiro.',
+    text: 'Aulas curtas, com exemplo de obra de verdade. Sem enrolação e sem teoria que não chega ao canteiro.',
   },
   {
     step: 'Evolua',
     icon: TrendingUp,
-    text: 'Tarefas práticas e checkpoints ao longo do curso, com o tutor disponível para revisar suas dúvidas e o seu raciocínio — não só a resposta.',
+    text: 'Tarefas e checkpoints mostram o que você já domina e o que ainda falta. Você sempre sabe onde está.',
   },
   {
     step: 'Conquiste',
     icon: Award,
-    text: 'Você termina dominando o assunto de ponta a ponta, com certificado de conclusão e código de validação pública para comprovar.',
+    text: 'Você conclui, recebe o certificado e passa a ser quem os outros procuram quando o assunto é projeto.',
   },
 ];
 
@@ -76,7 +82,6 @@ export default async function HomePage() {
     getCurrentUser(),
   ]);
 
-  const totalStudents = tutor?.studentCount ?? 0;
   const whatsapp = tutor?.socials.whatsapp ?? null;
   const waLink = whatsapp
     ? `https://wa.me/${whatsappDigits(whatsapp)}?text=${encodeURIComponent(
@@ -88,36 +93,43 @@ export default async function HomePage() {
   const bonus = courses.find((course) => course.isBonus);
   const bundleTotal = paid.reduce((total, course) => total + (course.priceCents ?? 0), 0);
 
+  const totalHours = Math.round(
+    courses.reduce(
+      (total, course) =>
+        total + (course.durationMinutes ?? Math.round(course.durationSeconds / 60)),
+      0,
+    ) / 60,
+  );
+
+  // Exemplo de custo do erro, calculado sobre o preço real do curso de orçamento.
+  const budgetCourse = paid.find((course) => /or[çc]amento/i.test(course.title)) ?? paid[0];
+  const exampleWork = 300_000;
+  const exampleError = Math.round(exampleWork * 0.02);
+
   return (
     <>
       {/* ---------------------------------------------------------- Hero --- */}
       <section className="bg-night bg-grid relative overflow-hidden">
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
-          <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="animate-rise">
-              <Badge tone="muted" icon={<Sparkles className="size-3.5" />}>
-                Formação técnica para quem vive de obra
+        <div className="relative mx-auto max-w-6xl px-4 pt-16 sm:px-6 lg:pt-24">
+          <div className="grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="animate-rise pb-16 lg:pb-24">
+              <Badge tone="muted" icon={<ShieldCheck className="size-3.5" />}>
+                Engenharia civil na prática
               </Badge>
 
-              <h1 className="mt-6 font-display text-4xl leading-[1.08] font-semibold text-white sm:text-5xl lg:text-[3.35rem]">
-                Do projeto ao orçamento,{' '}
-                <span className="text-gradient-brand">com segurança técnica.</span>
+              <h1 className="mt-6 font-display text-4xl leading-[1.08] font-semibold text-white sm:text-5xl lg:text-[3.4rem]">
+                Um erro na obra custa mais caro do que{' '}
+                <span className="text-gradient-brand">aprender certo.</span>
               </h1>
 
-              <p className="mt-5 max-w-xl text-lg leading-relaxed text-brand-200">
-                Cursos de engenharia civil conduzidos diretamente pelo{' '}
-                <strong className="font-semibold text-white">Eng. Amilton Araújo</strong>, com
-                acompanhamento do tutor durante toda a formação. Conteúdo suficiente para você sair
-                dominando o assunto — e com certificado para comprovar.
-              </p>
-
-              <p className="mt-6 font-display text-lg tracking-tight text-accent-300">
-                {SITE.slogan}
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-brand-100">
+                Leia qualquer projeto com segurança. Faça orçamentos que fecham a conta. E tenha um
+                certificado que prova que você sabe — não só que assistiu.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/cursos" variant="accent" size="lg">
-                  Ver cursos e valores
+                  Quero aprender agora
                   <ArrowRight aria-hidden className="size-4.5" />
                 </ButtonLink>
                 {user ? (
@@ -135,110 +147,166 @@ export default async function HomePage() {
                 )}
               </div>
 
-              <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-white/10 pt-8">
-                <Metric
-                  value={tutor?.courseCount ?? 0}
-                  label={(tutor?.courseCount ?? 0) === 1 ? 'curso disponível' : 'cursos disponíveis'}
-                />
-                <Metric
-                  value={totalStudents}
-                  label={totalStudents === 1 ? 'aluno matriculado' : 'alunos matriculados'}
-                />
+              <p className="mt-4 text-sm text-brand-300">
+                PIX com 10% de desconto ou até 12x no cartão · Acesso permanente
+              </p>
+
+              <dl className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-white/10 pt-7">
+                <Metric value={`${totalHours}h`} label="de conteúdo direto ao ponto" />
+                <Metric value={String(courses.length)} label="cursos, um deles de bônus" />
                 <Metric value="100%" label="online, no seu ritmo" />
               </dl>
             </div>
 
-            {/* Cartão do tutor */}
+            {/* Retrato: o rosto por trás do curso */}
             {tutor && (
-              <div className="animate-rise lg:justify-self-end" style={{ animationDelay: '120ms' }}>
-                <div className="relative mx-auto max-w-sm rounded-card border border-white/15 bg-white/[0.06] p-6 backdrop-blur-md">
-                  <div className="flex items-center gap-4">
-                    <TutorPhoto name={tutor.name} url={tutor.photoUrl} />
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold tracking-[0.14em] text-accent-300 uppercase">
-                        Professor e palestrante
-                      </p>
-                      <p className="mt-0.5 truncate font-display text-xl font-semibold text-white">
-                        {tutor.name}
-                      </p>
-                    </div>
-                  </div>
-
-                  {tutor.headline && (
-                    <p className="mt-4 text-sm leading-relaxed text-brand-200">{tutor.headline}</p>
-                  )}
-
-                  {tutor.specialties.length > 0 && (
-                    <ul className="mt-5 flex flex-wrap gap-1.5">
-                      {tutor.specialties.slice(0, 5).map((item) => (
-                        <li key={item}>
-                          <Badge tone="muted">{item}</Badge>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <Link
-                    href="/tutor"
-                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-300 transition-colors hover:text-accent-200"
-                  >
-                    Conhecer o tutor
-                    <MoveUpRight aria-hidden className="size-4" />
-                  </Link>
-                </div>
-              </div>
+              <figure
+                className="animate-rise relative mx-auto w-full max-w-md self-end lg:max-w-none"
+                style={{ animationDelay: '120ms' }}
+              >
+                <div className="pointer-events-none absolute inset-x-8 bottom-0 h-2/3 rounded-full bg-brand-500/25 blur-3xl" />
+                <img
+                  src={tutor.photoUrl}
+                  alt={`${tutor.name}, engenheiro civil`}
+                  width={900}
+                  height={966}
+                  fetchPriority="high"
+                  className="relative mx-auto max-h-[34rem] w-auto rounded-t-[2rem] object-cover object-top"
+                />
+                <figcaption className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/15 bg-brand-950/80 px-5 py-4 backdrop-blur-md sm:inset-x-8">
+                  <p className="font-display text-lg font-semibold text-white">{tutor.name}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-brand-200">
+                    MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de Projetos
+                  </p>
+                </figcaption>
+              </figure>
             )}
           </div>
         </div>
       </section>
 
-      {/* ----------------------------------------------------- Benefícios --- */}
+      {/* ------------------------------------------------------------ Dor --- */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-        <header className="max-w-2xl">
-          <p className="text-xs font-semibold tracking-[0.14em] text-brand-500 uppercase">
-            Por que estudar aqui
-          </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
-            Curso com tutor presente — não com vídeo esquecido numa pasta.
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-ink-600">
-            A diferença entre assistir a um curso e dominar um assunto é ter com quem falar quando a
-            dúvida aparece. Aqui o tutor acompanha você do começo ao certificado.
-          </p>
-        </header>
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <header>
+            <p className="text-xs font-semibold tracking-[0.14em] text-accent-600 uppercase">
+              Você se reconhece?
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
+              Você já passou por isso?
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-ink-600">
+              Não é falta de capacidade. É falta de método. E método se aprende — em semanas, não em
+              anos de tentativa e erro.
+            </p>
+          </header>
 
-        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {BENEFITS.map((benefit) => (
-            <li
-              key={benefit.title}
-              className="rounded-card border border-ink-200 bg-white p-6 shadow-soft"
-            >
-              <span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-600">
-                <benefit.icon aria-hidden className="size-5.5" />
-              </span>
-              <h3 className="mt-4 font-sans text-base font-semibold text-ink-900">
-                {benefit.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-600">{benefit.text}</p>
-            </li>
-          ))}
-        </ul>
+          <ul className="flex flex-col gap-3">
+            {PAINS.map((pain) => (
+              <li
+                key={pain}
+                className="flex items-start gap-3.5 rounded-card border border-ink-200 bg-white p-4 shadow-soft"
+              >
+                <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-danger-50 text-danger-500">
+                  <X aria-hidden className="size-3.5" strokeWidth={3} />
+                </span>
+                <span className="text-[0.9375rem] leading-relaxed font-medium text-ink-800">
+                  {pain}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------- Resultado --- */}
+      <section className="border-y border-ink-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <header className="max-w-2xl">
+            <p className="text-xs font-semibold tracking-[0.14em] text-brand-500 uppercase">
+              O que muda
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
+              Depois do curso, você trabalha diferente.
+            </h2>
+          </header>
+
+          <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {OUTCOMES.map((item) => (
+              <li
+                key={item.title}
+                className="rounded-card border border-ink-200 bg-ink-50 p-6"
+              >
+                <span className="grid size-11 place-items-center rounded-xl bg-brand-900 text-accent-300">
+                  <item.icon aria-hidden className="size-5.5" />
+                </span>
+                <h3 className="mt-4 font-sans text-base font-semibold text-ink-900">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-600">{item.text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ Valor --- */}
+      <section className="bg-night">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.14em] text-accent-300 uppercase">
+              Faça a conta
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-semibold text-white sm:text-4xl">
+              Quanto custa não saber?
+            </h2>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-brand-100">
+              Você não está pagando por aulas. Está pagando para não cometer o erro caro — aquele
+              que aparece só depois que o dinheiro já saiu.
+            </p>
+          </div>
+
+          <div className="rounded-card border border-white/15 bg-white/[0.06] p-7 backdrop-blur-md">
+            <p className="text-sm text-brand-200">
+              Exemplo: uma obra de <strong className="text-white">{formatPrice(exampleWork * 100)}</strong>
+            </p>
+            <p className="mt-1 text-sm text-brand-200">Um erro de apenas 2% no orçamento é:</p>
+            <p className="mt-2 font-display text-4xl font-semibold text-accent-300">
+              {formatPrice(exampleError * 100)}
+            </p>
+            <p className="mt-1 text-sm text-brand-200">saindo do seu bolso.</p>
+
+            {budgetCourse?.priceCents && (
+              <div className="mt-6 border-t border-white/15 pt-5">
+                <p className="text-sm text-brand-200">O curso de orçamento custa</p>
+                <p className="mt-1 font-display text-2xl font-semibold text-white">
+                  {formatPrice(budgetCourse.priceCents)}
+                </p>
+              </div>
+            )}
+            <p className="mt-4 text-xs text-brand-400">Exemplo ilustrativo, apenas para comparação.</p>
+          </div>
+        </div>
       </section>
 
       {/* --------------------------------------------------------- Cursos --- */}
-      <section className="border-y border-ink-200 bg-white">
+      <section id="cursos">
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <header className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-xl">
               <p className="text-xs font-semibold tracking-[0.14em] text-brand-500 uppercase">
-                Cursos disponíveis
+                Os cursos
               </p>
               <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
-                Escolha por onde começar.
+                Comece por onde dói mais.
               </h2>
+              <p className="mt-3 text-lg text-ink-600">
+                Cursos diretos, feitos para aplicar na segunda-feira. Leve os dois e ganhe o
+                terceiro.
+              </p>
             </div>
             <ButtonLink href="/cursos" variant="secondary">
-              Ver catálogo completo
+              Ver todos os cursos
               <ArrowRight aria-hidden className="size-4" />
             </ButtonLink>
           </header>
@@ -247,17 +315,17 @@ export default async function HomePage() {
             <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {courses.map((course) => (
                 <li key={course.id}>
-                  <CourseCard course={course} ctaLabel="Ver o curso" />
+                  <CourseCard course={course} ctaLabel="Quero este curso" />
                 </li>
               ))}
             </ul>
           ) : (
             <div className="mt-10 rounded-card border border-dashed border-ink-300 px-6 py-14 text-center">
               <p className="font-sans text-base font-semibold text-ink-800">
-                Os primeiros cursos estão sendo preparados.
+                Os primeiros cursos estão chegando.
               </p>
               <p className="mx-auto mt-1 max-w-md text-sm text-ink-500">
-                Crie sua conta para ser avisado assim que o conteúdo for publicado.
+                Crie sua conta para ser avisado assim que abrirem.
               </p>
               <ButtonLink href="/criar-conta" className="mt-6">
                 Criar conta gratuita
@@ -277,18 +345,18 @@ export default async function HomePage() {
                     Bônus especial
                   </p>
                   <h3 className="mt-1.5 font-display text-2xl font-semibold text-brand-900">
-                    Levou os dois cursos? O terceiro é por nossa conta.
+                    Leve os dois. O terceiro é presente.
                   </h3>
                   <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-700">
-                    Ao adquirir{' '}
+                    Quem leva{' '}
                     {paid.map((course, index) => (
                       <React.Fragment key={course.id}>
                         {index > 0 && ' e '}
                         <strong>{course.title}</strong>
                       </React.Fragment>
-                    ))}
-                    , você ganha o curso <strong>{bonus.title}</strong> — liberado automaticamente
-                    na sua conta, sem custo adicional.
+                    ))}{' '}
+                    recebe, sem pagar nada a mais, o curso <strong>{bonus.title}</strong> — liberado
+                    automaticamente na sua conta.
                   </p>
                 </div>
                 <div className="shrink-0">
@@ -297,7 +365,7 @@ export default async function HomePage() {
                     {formatPrice(bundleTotal)}
                   </p>
                   <p className="text-xs text-ink-500">
-                    {formatPrice(pixPrice(bundleTotal, 10))} no PIX
+                    {formatPrice(pixPrice(bundleTotal, 10))} à vista no PIX
                   </p>
                 </div>
               </div>
@@ -305,21 +373,21 @@ export default async function HomePage() {
           )}
 
           {/* --------------------------------------------------- Pagamento --- */}
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <PayCard
               icon={QrCode}
               title="PIX com 10% de desconto"
-              text="Pagamento à vista, com desconto aplicado sobre o valor do curso."
+              text="Pagando à vista, você economiza logo de cara."
             />
             <PayCard
               icon={CreditCard}
-              title="Até 12x no cartão"
-              text="Parcelamento no cartão de crédito, combinado direto com o tutor."
+              title="Até 12x no cartão de crédito"
+              text="A parcela cabe no mês, e o curso é seu para sempre."
             />
             <PayCard
               icon={MessagesSquare}
-              title={whatsapp ?? 'Suporte direto'}
-              text="Informações, dúvidas e suporte por WhatsApp, antes e durante o curso."
+              title={whatsapp ?? 'Tire suas dúvidas'}
+              text="Fale no WhatsApp antes de decidir. Sem compromisso."
               href={waLink ?? undefined}
             />
           </div>
@@ -327,18 +395,17 @@ export default async function HomePage() {
       </section>
 
       {/* ---------------------------------------------------- Metodologia --- */}
-      <section id="metodologia" className="scroll-mt-20">
+      <section id="metodologia" className="scroll-mt-20 border-y border-ink-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <header className="max-w-2xl">
             <p className="text-xs font-semibold tracking-[0.14em] text-brand-500 uppercase">
-              Metodologia
+              Como funciona
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
               Três passos. Sempre nessa ordem.
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-ink-600">
-              O slogan não é enfeite: é o desenho do curso. Cada módulo leva você de um degrau ao
-              seguinte, com o tutor acompanhando a subida.
+              {SITE.slogan} não é enfeite: é o desenho de cada curso.
             </p>
           </header>
 
@@ -346,11 +413,11 @@ export default async function HomePage() {
             {METHOD.map((item, index) => (
               <li
                 key={item.step}
-                className="relative rounded-card border border-ink-200 bg-white p-7 shadow-soft"
+                className="relative rounded-card border border-ink-200 bg-ink-50 p-7"
               >
                 <span
                   aria-hidden
-                  className="font-display absolute top-6 right-6 text-5xl leading-none font-semibold text-ink-100"
+                  className="font-display absolute top-6 right-6 text-5xl leading-none font-semibold text-ink-200"
                 >
                   {index + 1}
                 </span>
@@ -364,74 +431,47 @@ export default async function HomePage() {
               </li>
             ))}
           </ol>
-
-          {tutor?.methodology && (
-            <div className="mt-10 rounded-card border border-ink-200 bg-white p-7 shadow-soft">
-              <h3 className="flex items-center gap-2 font-sans text-sm font-semibold text-ink-900">
-                <Compass aria-hidden className="size-4 text-brand-500" />
-                Como o tutor conduz
-              </h3>
-              <p className="mt-2 leading-relaxed whitespace-pre-line text-ink-600">
-                {tutor.methodology}
-              </p>
-            </div>
-          )}
         </div>
       </section>
 
       {/* --------------------------------------------------------- Tutor --- */}
       {tutor && (
-        <section className="border-y border-ink-200 bg-white">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
+        <section>
+          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
             <div className="relative">
-              <div className="overflow-hidden rounded-card bg-brand-900">
-                {tutor.photoUrl ? (
-                  <img
-                    src={tutor.photoUrl}
-                    alt={`Foto de ${tutor.name}`}
-                    className="aspect-[4/5] w-full object-cover"
-                  />
-                ) : (
-                  <div className="bg-night bg-grid grid aspect-[4/5] w-full place-items-center">
-                    <span className="font-display relative text-6xl font-semibold text-white/20">
-                      {tutor.name
-                        .replace(/^Eng\.\s*/i, '')
-                        .split(' ')
-                        .slice(0, 2)
-                        .map((part) => part[0])
-                        .join('')}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="absolute -right-4 -bottom-5 hidden rounded-xl border border-ink-200 bg-white px-4 py-3 shadow-lift sm:block">
-                <p className="flex items-center gap-2 text-sm font-semibold text-brand-900">
-                  <Users aria-hidden className="size-4 text-brand-500" />
-                  {totalStudents} {totalStudents === 1 ? 'aluno' : 'alunos'}
-                </p>
+              <img
+                src={tutor.fieldPhotoUrl}
+                alt={`${tutor.name} em obra, de capacete`}
+                width={900}
+                height={993}
+                loading="lazy"
+                className="aspect-[4/4.4] w-full rounded-card object-cover object-top shadow-lift"
+              />
+              <div className="absolute -right-3 -bottom-5 hidden rounded-2xl border border-ink-200 bg-white px-5 py-4 shadow-lift sm:block">
+                <TutorSignature size="sm" />
               </div>
             </div>
 
             <div>
               <p className="text-xs font-semibold tracking-[0.14em] text-brand-500 uppercase">
-                Quem ensina
+                Quem vai te ensinar
               </p>
               <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">{tutor.name}</h2>
-              {tutor.headline && (
-                <p className="mt-2 text-lg font-medium text-accent-600">{tutor.headline}</p>
-              )}
-              {tutor.bio && (
-                <p className="mt-5 leading-relaxed whitespace-pre-line text-ink-600">{tutor.bio}</p>
-              )}
+              <p className="mt-2 text-lg font-medium text-accent-600">
+                Engenheiro Civil · MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de
+                Projetos
+              </p>
 
-              {tutor.experience && (
-                <div className="mt-6">
-                  <h3 className="font-sans text-sm font-semibold text-ink-900">Formação e experiência</h3>
-                  <p className="mt-1.5 leading-relaxed whitespace-pre-line text-sm text-ink-600">
-                    {tutor.experience}
-                  </p>
-                </div>
-              )}
+              <p className="mt-5 leading-relaxed text-ink-600">
+                Perícia é o trabalho de descobrir por que uma obra deu errado. Quem estuda isso sabe
+                exatamente onde os erros nascem — na leitura do projeto, no orçamento, na
+                responsabilidade que ninguém percebeu que estava assumindo.
+              </p>
+              <p className="mt-4 leading-relaxed text-ink-600">
+                É esse olhar que está em cada aula: o que realmente importa, o que quase todo mundo
+                erra e como você evita. E se bater dúvida no meio do caminho, você tem a quem
+                perguntar.
+              </p>
 
               {tutor.specialties.length > 0 && (
                 <ul className="mt-6 flex flex-wrap gap-2">
@@ -446,7 +486,7 @@ export default async function HomePage() {
               )}
 
               <ButtonLink href="/tutor" variant="secondary" className="mt-8">
-                Ver apresentação completa
+                Conhecer a trajetória
                 <ArrowRight aria-hidden className="size-4" />
               </ButtonLink>
             </div>
@@ -458,36 +498,39 @@ export default async function HomePage() {
       <section className="bg-night">
         <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
           <h2 className="font-display text-3xl font-semibold text-white sm:text-4xl">
-            Comece hoje. O primeiro passo leva dois minutos.
+            Você pode continuar dependendo dos outros para entender um projeto.{' '}
+            <span className="text-gradient-brand">Ou pode aprender agora.</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-brand-200">
-            Crie sua conta, escolha o curso e combine o pagamento direto com o tutor. O acesso é
-            liberado na sequência — e a plataforma cuida do resto, inclusive de lembrar onde você
-            parou.
+          <p className="mx-auto mt-5 max-w-xl text-lg text-brand-100">
+            Crie sua conta, escolha o curso e comece hoje. Quanto antes você domina, antes esse
+            conhecimento começa a se pagar.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <ButtonLink href={user ? '/painel' : '/criar-conta'} variant="accent" size="lg">
-              {user ? 'Ir para o meu painel' : 'Criar conta gratuita'}
+              {user ? 'Ir para o meu painel' : 'Quero começar hoje'}
               <ArrowRight aria-hidden className="size-4.5" />
             </ButtonLink>
             {waLink ? (
               <ButtonLink href={waLink} variant="outline-light" size="lg" target="_blank">
                 <MessagesSquare aria-hidden className="size-4.5" />
-                Falar com o tutor
+                Tirar uma dúvida
               </ButtonLink>
             ) : (
               <ButtonLink href="/cursos" variant="outline-light" size="lg">
-                Explorar os cursos
+                Ver os cursos
               </ButtonLink>
             )}
           </div>
+          <p className="mt-5 text-sm text-brand-300">
+            PIX com 10% de desconto · até 12x no cartão · certificado ao concluir
+          </p>
         </div>
       </section>
     </>
   );
 }
 
-function Metric({ value, label }: { value: number | string; label: string }) {
+function Metric({ value, label }: { value: string; label: string }) {
   return (
     <div>
       <dt className="sr-only">{label}</dt>
@@ -523,40 +566,18 @@ function PayCard({
   );
 
   const className =
-    'flex items-start gap-3 rounded-card border border-ink-200 bg-ink-50 p-5 transition-colors';
+    'flex items-start gap-3 rounded-card border border-ink-200 bg-white p-5 transition-colors';
 
   return href ? (
-    <a href={href} target="_blank" rel="noreferrer" className={`${className} hover:border-brand-300 hover:bg-white`}>
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className={`${className} hover:border-brand-300 hover:bg-brand-50`}
+    >
       {content}
     </a>
   ) : (
     <div className={className}>{content}</div>
-  );
-}
-
-function TutorPhoto({ name, url }: { name: string; url: string | null }) {
-  if (url) {
-    return (
-      <img
-        src={url}
-        alt={`Foto de ${name}`}
-        className="size-16 shrink-0 rounded-full object-cover ring-2 ring-accent-300/40"
-      />
-    );
-  }
-  const letters = name
-    .replace(/^Eng\.\s*/i, '')
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
-  return (
-    <span
-      aria-hidden
-      className="grid size-16 shrink-0 place-items-center rounded-full bg-brand-800 font-display text-xl font-semibold text-accent-300 ring-2 ring-accent-300/40"
-    >
-      {letters}
-    </span>
   );
 }

@@ -21,9 +21,9 @@ export default async function RegisterPage({
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-semibold">Comece agora.</h1>
+      <h1 className="font-display text-3xl font-semibold">Dê o primeiro passo.</h1>
       <p className="mt-2 text-ink-600">
-        Leva dois minutos. Depois é só escolher um curso e assistir à primeira aula.
+        Leva dois minutos. Crie sua conta, escolha o curso e comece hoje.
       </p>
 
       <div className="mt-8">

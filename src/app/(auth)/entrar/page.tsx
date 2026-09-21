@@ -20,9 +20,9 @@ export default async function LoginPage({
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-semibold">Que bom te ver de novo.</h1>
+      <h1 className="font-display text-3xl font-semibold">Continue de onde parou.</h1>
       <p className="mt-2 text-ink-600">
-        Entre para continuar de onde você parou.
+        Entre e volte direto para a sua próxima aula.
       </p>
 
       <div className="mt-8">

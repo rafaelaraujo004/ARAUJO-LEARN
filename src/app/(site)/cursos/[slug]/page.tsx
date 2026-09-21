@@ -23,6 +23,7 @@ import { courseTotals, coverUrl, getCourseBySlug } from '@/server/courses';
 import { getCurrentUser, isStaff } from '@/server/auth/session';
 import { courseAccess } from '@/server/access';
 import { db } from '@/server/db';
+import { TUTOR_FIELD_PHOTO } from '@/server/tutor';
 import { LEVEL_LABEL } from '@/lib/constants';
 import { formatDuration, formatPrice, pixPrice, pluralize } from '@/lib/utils';
 
@@ -139,11 +140,9 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                 {totals.materialCount > 0 && (
                   <Fact icon={FileText} label="Materiais" value={String(totals.materialCount)} />
                 )}
-                <Fact
-                  icon={Users}
-                  label="Alunos"
-                  value={String(course._count.enrollments)}
-                />
+                {course._count.enrollments >= 10 && (
+                  <Fact icon={Users} label="Alunos" value={String(course._count.enrollments)} />
+                )}
               </dl>
             </div>
 
@@ -248,7 +247,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                   <ul className="mt-5 flex flex-col gap-2 border-t border-ink-200 pt-4 text-sm text-ink-600">
                     <li className="flex items-center gap-2">
                       <MessagesSquare aria-hidden className="size-4 shrink-0 text-brand-500" />
-                      Acompanhamento direto com o tutor
+                      Suporte para tirar dúvidas durante o curso
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 aria-hidden className="size-4 shrink-0 text-progress-500" />
@@ -261,7 +260,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                     {course.certificateEnabled && (
                       <li className="flex items-center gap-2">
                         <Award aria-hidden className="size-4 shrink-0 text-accent-500" />
-                        Certificado com código de validação
+                        Certificado que qualquer um pode conferir
                       </li>
                     )}
                   </ul>
@@ -277,7 +276,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         <div className="min-w-0">
           {course.description && (
             <section>
-              <h2 className="font-display text-2xl font-semibold">Sobre o curso</h2>
+              <h2 className="font-display text-2xl font-semibold">O que você vai aprender</h2>
               <div className="prose-lesson mt-4 whitespace-pre-line">{course.description}</div>
             </section>
           )}
@@ -420,8 +419,16 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         {/* --------------------------------------------------------- Tutor --- */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <Card className="p-6">
+            <img
+              src={TUTOR_FIELD_PHOTO}
+              alt={`${tutor.name} em obra`}
+              width={900}
+              height={993}
+              loading="lazy"
+              className="mb-5 aspect-[4/3.2] w-full rounded-xl object-cover object-top"
+            />
             <p className="text-xs font-semibold tracking-[0.14em] text-brand-500 uppercase">
-              Seu tutor
+              Quem ensina
             </p>
             <h2 className="mt-2 font-display text-xl font-semibold">{tutor.name}</h2>
             {tutorHeadline && <p className="mt-1 text-sm text-accent-600">{tutorHeadline}</p>}
@@ -441,7 +448,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               href="/tutor"
               className="mt-5 inline-block text-sm font-semibold text-brand-600 hover:underline"
             >
-              Ver perfil completo →
+              Conhecer a trajetória →
             </Link>
           </Card>
 

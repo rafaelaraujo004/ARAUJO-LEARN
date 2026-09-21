@@ -80,9 +80,9 @@ const COURSES: CourseSeed[] = [
     slug: 'leitura-e-interpretacao-de-projetos-de-engenharia',
     title: 'Leitura e Interpretação de Projetos de Engenharia',
     shortDescription:
-      'Aprenda a ler qualquer prancha com segurança: arquitetura, estrutura e complementares, da escala ao canteiro de obras.',
+      'Leia qualquer prancha com segurança e pare de depender de terceiros para entender um projeto.',
     description:
-      'Projeto mal lido vira retrabalho, prejuízo e discussão no canteiro. Este curso ataca exatamente isso: você aprende a percorrer um projeto completo — arquitetônico, estrutural e complementares — entendendo o que cada linha, cota e símbolo está comunicando.\n\nO curso é conduzido diretamente pelo Eng. Amilton Araújo, com acompanhamento durante toda a formação. Você pode tirar dúvidas sobre os projetos que estiver enfrentando no seu trabalho, e não apenas sobre os exemplos das aulas.\n\nAo final, você não sai "sabendo um pouco": sai capaz de pegar um projeto que nunca viu, entender a intenção do projetista, identificar incompatibilidades e extrair o que precisa para orçar e executar.',
+      'Projeto mal lido vira retrabalho, prejuízo e discussão no canteiro. Este curso ensina você a percorrer um projeto completo — arquitetônico, estrutural e complementares — entendendo o que cada linha, cota e símbolo está dizendo.\n\nO que separa quem "sabe mais ou menos" de quem tem segurança é o método. Você aprende a ordem certa de leitura, os pontos onde quase todo mundo erra e como encontrar incompatibilidades antes que virem custo.\n\nNo fim, você pega um projeto que nunca viu e sabe exatamente o que ele pede: como executar, o que perguntar ao projetista e o que levantar para orçar.',
     objective:
       'Ler e interpretar, com autonomia, projetos arquitetônicos, estruturais e complementares — identificando escalas, cotas, simbologia, incompatibilidades e as informações necessárias para executar e orçar a obra.',
     audience:
@@ -90,12 +90,7 @@ const COURSES: CourseSeed[] = [
     level: 'BEGINNER',
     durationMinutes: 480,
     priceCents: 19_900,
-    includes: [
-      'Apostila completa',
-      'Certificado de conclusão',
-      'Interação direta com o tutor',
-      'Acesso permanente ao conteúdo',
-    ],
+    includes: ['Apostila completa', 'Certificado de conclusão', 'Suporte para tirar dúvidas', 'Acesso permanente ao conteúdo'],
     modules: [
       {
         title: 'Fundamentos do desenho técnico',
@@ -204,9 +199,9 @@ const COURSES: CourseSeed[] = [
     slug: 'orcamento-preliminar-de-obras-civis',
     title: 'Orçamento Preliminar de Obras Civis',
     shortDescription:
-      'Monte orçamentos confiáveis do zero: quantitativos, composições, BDI, curva ABC e cronograma físico-financeiro.',
+      'Monte orçamentos que fecham a conta: quantitativos, composições, BDI, curva ABC e cronograma.',
     description:
-      'Orçamento errado não aparece no dia em que é feito — aparece seis meses depois, quando o dinheiro acaba. Este curso ensina o método completo do orçamento preliminar de obras civis, do levantamento de quantitativos à planilha final apresentada ao cliente.\n\nVocê aprende a usar as fontes oficiais de preço (SINAPI e similares), a montar composições de custo, a calcular o BDI sem inventar percentual e a construir a curva ABC para saber onde o orçamento realmente se decide.\n\nO acompanhamento é direto com o Eng. Amilton Araújo, que atua com perícia e avaliação de engenharia — ou seja, com quem vê na prática o que acontece quando um orçamento é feito sem critério.',
+      'Orçamento errado não aparece no dia em que é feito. Aparece meses depois, quando o dinheiro acaba. Este curso ensina o método completo do orçamento preliminar de obras civis, do levantamento de quantitativos até a planilha que você apresenta ao cliente.\n\nVocê aprende a usar as fontes oficiais de preço (SINAPI e similares), a montar composições de custo, a calcular o BDI sem inventar percentual e a usar a curva ABC para saber onde o orçamento realmente se decide.\n\nO resultado: propostas que você consegue defender número por número — e que não deixam prejuízo escondido.',
     objective:
       'Elaborar um orçamento preliminar completo de uma obra civil: levantar quantitativos a partir do projeto, compor custos unitários, aplicar BDI, montar a planilha orçamentária, a curva ABC e o cronograma físico-financeiro.',
     audience:
@@ -214,12 +209,7 @@ const COURSES: CourseSeed[] = [
     level: 'INTERMEDIATE',
     durationMinutes: 720,
     priceCents: 24_900,
-    includes: [
-      'Material complementar',
-      'Certificado de conclusão',
-      'Interação direta com o tutor',
-      'Acesso permanente ao conteúdo',
-    ],
+    includes: ['Material complementar', 'Certificado de conclusão', 'Suporte para tirar dúvidas', 'Acesso permanente ao conteúdo'],
     modules: [
       {
         title: 'Fundamentos do orçamento',
@@ -326,9 +316,9 @@ const COURSES: CourseSeed[] = [
     slug: 'legislacao-de-obra-e-sistema-crea',
     title: 'Legislação de Obra e Sistema CREA',
     shortDescription:
-      'Responsabilidade técnica, ART, atribuições profissionais e licenciamento — o que todo profissional de obra precisa saber para não se expor.',
+      'Entenda ART, atribuições e responsabilidade técnica antes que um erro custe caro.',
     description:
-      'Curso bônus, liberado automaticamente para quem adquire os dois cursos da formação.\n\nBoa parte dos problemas graves em obra não é técnica: é de responsabilidade. Quem assina o quê, qual atribuição cada profissional tem, quando a ART é obrigatória e o que acontece quando ela não existe.\n\nConteúdo conduzido pelo Eng. Amilton Araújo, com a perspectiva de quem atua em perícia e avaliação de engenharia.',
+      'Bônus liberado automaticamente para quem leva os dois cursos da formação.\n\nBoa parte dos problemas graves em obra não é técnica: é de responsabilidade. Quem assina o quê, qual atribuição cada profissional tem, quando a ART é obrigatória e o que acontece quando ela não existe.\n\nVocê termina sabendo exatamente o tamanho da responsabilidade que assume — e como se proteger.',
     objective:
       'Entender o Sistema CONFEA/CREA, emitir e interpretar ART corretamente, conhecer as atribuições profissionais e as obrigações legais que cercam uma obra.',
     audience:
@@ -341,7 +331,7 @@ const COURSES: CourseSeed[] = [
       'leitura-e-interpretacao-de-projetos-de-engenharia',
       'orcamento-preliminar-de-obras-civis',
     ],
-    includes: ['Certificado de conclusão', 'Interação direta com o tutor'],
+    includes: ['Certificado de conclusão', 'Suporte para tirar dúvidas'],
     modules: [
       {
         title: 'Responsabilidade técnica',

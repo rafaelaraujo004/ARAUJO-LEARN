@@ -29,7 +29,7 @@ export function CourseCard({
       : null;
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-card border border-ink-200 bg-white shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-lift">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-card border border-ink-200 bg-white shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-lift">
       <div className="relative aspect-[16/9] overflow-hidden bg-brand-900">
         {course.coverUrl ? (
           // Capa vem do bucket com URL assinada; `next/image` não otimiza URL temporária.

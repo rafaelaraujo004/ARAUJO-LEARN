@@ -64,11 +64,11 @@ export default async function CatalogPage({
       <section className="bg-night bg-grid">
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <h1 className="font-display text-4xl font-semibold text-white sm:text-5xl">
-            Catálogo de cursos
+            Escolha o curso que resolve o seu problema.
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-brand-200">
-            Conteúdo organizado em módulos, com material de apoio e certificado ao final. Escolha
-            por onde começar.
+          <p className="mt-4 max-w-2xl text-lg text-brand-100">
+            Direto ao ponto, do jeito que a obra pede. Você termina sabendo fazer — e com certificado
+            para provar.
           </p>
         </div>
       </section>
@@ -143,7 +143,7 @@ export default async function CatalogPage({
                   <CourseCard
                     course={course}
                     progress={progress}
-                    ctaLabel={progress === undefined ? 'Ver o curso' : 'Continuar'}
+                    ctaLabel={progress === undefined ? 'Quero este curso' : 'Continuar'}
                   />
                 </li>
               );

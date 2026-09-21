@@ -6,9 +6,9 @@ const GROUPS = [
   {
     title: 'Plataforma',
     links: [
-      { href: '/cursos', label: 'Catálogo de cursos' },
-      { href: '/tutor', label: 'Conheça o tutor' },
-      { href: '/#metodologia', label: 'Metodologia' },
+      { href: '/cursos', label: 'Cursos e valores' },
+      { href: '/tutor', label: 'Quem ensina' },
+      { href: '/#metodologia', label: 'Como funciona' },
       { href: '/validar', label: 'Validar certificado' },
     ],
   },

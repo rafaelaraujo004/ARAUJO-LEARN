@@ -9,6 +9,9 @@ import { storage } from '@/server/storage';
  * o tutor principal.
  */
 
+export const TUTOR_PORTRAIT = '/tutor/terno.webp';
+export const TUTOR_FIELD_PHOTO = '/tutor/obra.webp';
+
 export interface TutorPresentation {
   id: string;
   name: string;
@@ -18,7 +21,10 @@ export interface TutorPresentation {
   methodology: string | null;
   specialties: string[];
   socials: Record<string, string>;
-  photoUrl: string | null;
+  /** Retrato de estúdio (fundo escuro) — usado no topo da página. */
+  photoUrl: string;
+  /** Foto em obra (fundo claro) — usada nas seções sobre o tutor. */
+  fieldPhotoUrl: string;
   courseCount: number;
   studentCount: number;
 }
@@ -64,7 +70,9 @@ export const getPrimaryTutor = cache(async (): Promise<TutorPresentation | null>
     methodology: profile?.methodology ?? null,
     specialties: profile?.specialties ?? [],
     socials: normalizeSocials(profile?.socials),
-    photoUrl: photoKey ? await safeUrl(photoKey) : null,
+    // Se o tutor enviar uma foto própria pelo painel, ela substitui o retrato padrão.
+    photoUrl: (photoKey ? await safeUrl(photoKey) : null) ?? TUTOR_PORTRAIT,
+    fieldPhotoUrl: TUTOR_FIELD_PHOTO,
     courseCount,
     studentCount,
   };

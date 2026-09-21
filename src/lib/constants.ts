@@ -59,7 +59,7 @@ export const SITE = {
   shortName: 'Araújo Learn',
   slogan: 'Aprenda. Evolua. Conquiste.',
   description:
-    'Plataforma de cursos online com ensino direto, prático e acompanhado do começo ao fim.',
+    'Cursos de engenharia civil para quem quer ler projetos e orçar obras com segurança — e provar que sabe.',
 } as const;
 
 export const LEVEL_LABEL: Record<string, string> = {

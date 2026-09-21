@@ -35,17 +35,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <p className="font-display text-3xl leading-tight font-semibold text-white">
             Aprenda. Evolua. Conquiste.
           </p>
-          <p className="mt-4 leading-relaxed text-brand-200">
-            Seus cursos, seu progresso e seus certificados em um só lugar. A plataforma lembra
-            exatamente onde você parou — você só precisa voltar.
+          <p className="mt-4 leading-relaxed text-brand-100">
+            Cada aula assistida é um passo a menos entre você e a obra que você quer fechar. A
+            plataforma guarda onde você parou — você só precisa voltar.
           </p>
         </div>
 
         <ul className="relative flex flex-col gap-3 text-sm text-brand-200">
           {[
-            'Aulas em vídeo com retomada automática',
-            'Materiais para download em cada módulo',
-            'Certificado com código de validação',
+            'Retoma exatamente de onde você parou',
+            'Apostila e materiais para baixar',
+            'Certificado que qualquer um pode conferir',
           ].map((item) => (
             <li key={item} className="flex items-center gap-2.5">
               <span aria-hidden className="size-1.5 rounded-full bg-accent-300" />

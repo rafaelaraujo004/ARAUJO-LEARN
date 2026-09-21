@@ -205,20 +205,32 @@ export async function unlockBonusCourses(userId: string): Promise<string[]> {
   });
   if (bonuses.length === 0) return [];
 
+  const now = Date.now();
+  const enrollments = await db.enrollment.findMany({
+    where: { userId },
+    select: { courseId: true, status: true, expiresAt: true },
+  });
+  // "Ativo" de verdade: status aberto E prazo não vencido (o status só é
+  // normalizado quando alguém tenta acessar).
   const active = new Set(
-    (
-      await db.enrollment.findMany({
-        where: { userId, status: { in: ['ACTIVE', 'COMPLETED'] } },
-        select: { courseId: true },
-      })
-    ).map((item) => item.courseId),
+    enrollments
+      .filter(
+        (item) =>
+          (item.status === 'ACTIVE' || item.status === 'COMPLETED') &&
+          (!item.expiresAt || item.expiresAt.getTime() > now),
+      )
+      .map((item) => item.courseId),
+  );
+  // Bônus que o tutor removeu de propósito não volta sozinho.
+  const revoked = new Set(
+    enrollments.filter((item) => item.status === 'REVOKED').map((item) => item.courseId),
   );
 
   const unlocked: string[] = [];
 
   for (const bonus of bonuses) {
     if (bonus.unlocksWithCourseIds.length === 0) continue;
-    if (active.has(bonus.id)) continue;
+    if (active.has(bonus.id) || revoked.has(bonus.id)) continue;
     if (!bonus.unlocksWithCourseIds.every((required) => active.has(required))) continue;
 
     await db.enrollment.upsert({

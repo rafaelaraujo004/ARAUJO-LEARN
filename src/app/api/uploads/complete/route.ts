@@ -4,6 +4,7 @@ import { apiStaff, HttpError } from '@/server/auth/guards';
 import { ok, route } from '@/server/api';
 import { storage } from '@/server/storage';
 import { completeUploadSchema } from '@/lib/validation';
+import { MAX_DOCUMENT_BYTES, MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from '@/lib/constants';
 
 /**
  * Confirma o upload: fecha o multipart (se houver), confere o objeto no bucket
@@ -32,6 +33,19 @@ export const POST = route('uploads.complete', async (request: NextRequest) => {
   if (!info) {
     await db.mediaAsset.update({ where: { id: media.id }, data: { status: 'FAILED' } });
     throw new HttpError(422, 'O arquivo não chegou ao armazenamento. Tente enviar novamente.');
+  }
+
+  // A URL assinada não limita o tamanho enviado: confere o objeto real.
+  const limit =
+    media.kind === 'VIDEO'
+      ? MAX_VIDEO_BYTES
+      : media.kind === 'IMAGE'
+        ? MAX_IMAGE_BYTES
+        : MAX_DOCUMENT_BYTES;
+  if (info.sizeBytes > limit) {
+    await store.delete(media.storageKey).catch(() => {});
+    await db.mediaAsset.update({ where: { id: media.id }, data: { status: 'FAILED' } });
+    throw new HttpError(422, 'O arquivo enviado ultrapassa o limite permitido para este tipo.');
   }
 
   const updated = await db.mediaAsset.update({

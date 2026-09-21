@@ -175,36 +175,43 @@ export async function submitAttempt(
     };
   }
 
-  const used = await db.activityAttempt.count({
-    where: { userId: user.id, activityId, submittedAt: { not: null } },
-  });
-  if (activity.maxAttempts !== null && used >= activity.maxAttempts) {
-    throw new HttpError(403, 'Você já usou todas as tentativas desta atividade.');
-  }
-
+  // Conta e cria na MESMA transação, sob trava por (aluno, atividade): dois
+  // envios simultâneos não conseguem passar juntos pelo limite de tentativas.
   const now = new Date();
-  await db.activityAttempt.create({
-    data: {
-      activityId,
-      userId: user.id,
-      score: graded.score,
-      maxScore: graded.maxScore,
-      passed: graded.passed,
-      startedAt: now,
-      submittedAt: now,
-      answers: {
-        create: clean.map((answer) => {
-          const result = graded.results.find((item) => item.questionId === answer.questionId);
-          return {
-            questionId: answer.questionId,
-            selectedOptionIds: answer.selectedOptionIds,
-            textAnswer: answer.textAnswer || null,
-            isCorrect: result?.isCorrect ?? false,
-            pointsAwarded: result?.pointsAwarded ?? 0,
-          };
-        }),
+  const used = await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`attempt:${user.id}:${activityId}`}))`;
+
+    const count = await tx.activityAttempt.count({
+      where: { userId: user.id, activityId, submittedAt: { not: null } },
+    });
+    if (activity.maxAttempts !== null && count >= activity.maxAttempts) {
+      throw new HttpError(403, 'Você já usou todas as tentativas desta atividade.');
+    }
+
+    await tx.activityAttempt.create({
+      data: {
+        activityId,
+        userId: user.id,
+        score: graded.score,
+        maxScore: graded.maxScore,
+        passed: graded.passed,
+        startedAt: now,
+        submittedAt: now,
+        answers: {
+          create: clean.map((answer) => {
+            const result = graded.results.find((item) => item.questionId === answer.questionId);
+            return {
+              questionId: answer.questionId,
+              selectedOptionIds: answer.selectedOptionIds,
+              textAnswer: answer.textAnswer || null,
+              isCorrect: result?.isCorrect ?? false,
+              pointsAwarded: result?.pointsAwarded ?? 0,
+            };
+          }),
+        },
       },
-    },
+    });
+    return count;
   });
 
   // Passar em uma atividade obrigatória pode ser o que faltava para concluir o curso.

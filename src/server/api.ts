@@ -78,8 +78,23 @@ export function pruneRateLimits(): void {
   }
 }
 
+/**
+ * IP do cliente a partir dos cabeçalhos.
+ *
+ * Atrás do proxy do Railway, o cliente pode enviar o próprio X-Forwarded-For; o
+ * proxy ACRESCENTA o IP real ao final. Por isso vale a ÚLTIMA entrada — a
+ * primeira é controlada por quem faz a requisição e permitiria burlar o limite
+ * de tentativas trocando o valor a cada chamada.
+ */
+export function clientIpFromHeaders(headers: Pick<Headers, 'get'>): string {
+  const forwarded = headers.get('x-forwarded-for');
+  if (forwarded) {
+    const last = forwarded.split(',').at(-1)?.trim();
+    if (last) return last;
+  }
+  return headers.get('x-real-ip') ?? 'desconhecido';
+}
+
 export function clientIp(request: Request): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0]?.trim() ?? 'desconhecido';
-  return request.headers.get('x-real-ip') ?? 'desconhecido';
+  return clientIpFromHeaders(request.headers);
 }

@@ -326,4 +326,103 @@ suite('regras de negócio (banco real)', () => {
       expect(note).not.toBeNull();
     });
   });
+
+  // ------------------------------------------------- Regressões da revisão
+  describe('regressões (revisão de código)', () => {
+    it('recalcular progresso NÃO reativa um acesso revogado', async () => {
+      // O aluno já concluiu o curso A; o tutor revoga; o tutor clica em "emitir certificado".
+      await access.grantAccess(ids.student, ids.courseA);
+      await access.revokeAccess(ids.student, ids.courseA);
+      await progress.refreshCourseProgress(ids.student, ids.courseA);
+
+      const row = await db.enrollment.findUnique({
+        where: { userId_courseId: { userId: ids.student, courseId: ids.courseA } },
+      });
+      expect(row?.status).toBe('REVOKED');
+      expect((await access.lessonAccess(asUser(ids.student), ids.lessonsA[1]!)).allowed).toBe(false);
+
+      await access.grantAccess(ids.student, ids.courseA); // restaura para os testes seguintes
+    });
+
+    it('cliente não conclui aula COM vídeo apenas declarando completed=true', async () => {
+      const media = await db.mediaAsset.create({
+        data: {
+          kind: 'VIDEO',
+          provider: 'local',
+          storageKey: `teste/${tag}.mp4`,
+          originalName: 'x.mp4',
+          mimeType: 'video/mp4',
+          status: 'READY',
+          durationSeconds: 600,
+        },
+      });
+      const lesson = await db.lesson.create({
+        data: {
+          moduleId: (await db.module.findFirstOrThrow({ where: { courseId: ids.courseB } })).id,
+          title: 'Com vídeo',
+          slug: `com-video-${tag}`,
+          position: 9,
+          durationSeconds: 1, // duração cadastrada errada de propósito
+          videoId: media.id,
+        },
+      });
+      await access.grantAccess(ids.student, ids.courseB);
+
+      const cheat = await progress.recordLessonProgress(ids.student, lesson.id, {
+        positionSeconds: 0,
+        durationSeconds: 1, // cliente mentindo sobre a duração
+        completed: true,
+      });
+      expect(cheat.lessonCompleted).toBe(false);
+
+      // Assistir de verdade (posição alta na duração REAL do servidor) conclui.
+      const real = await progress.recordLessonProgress(ids.student, lesson.id, {
+        positionSeconds: 570,
+      });
+      expect(real.lessonCompleted).toBe(true);
+
+      await db.lesson.delete({ where: { id: lesson.id } });
+      await db.mediaAsset.delete({ where: { id: media.id } });
+    });
+
+    it('bônus revogado pelo tutor não volta sozinho', async () => {
+      await access.revokeAccess(ids.student, ids.bonus);
+      await access.grantAccess(ids.student, ids.courseA); // dispara a checagem de bônus
+      const row = await db.enrollment.findUnique({
+        where: { userId_courseId: { userId: ids.student, courseId: ids.bonus } },
+      });
+      expect(row?.status).toBe('REVOKED');
+    });
+
+    it('bônus não é liberado quando um curso exigido já venceu', async () => {
+      const other = await db.user.create({
+        data: { name: 'Outro', email: `outro-${tag}@teste.local`, passwordHash: 'x' },
+      });
+      await access.grantAccess(other.id, ids.courseA, { expiresAt: new Date(Date.now() - 60_000) });
+      await access.grantAccess(other.id, ids.courseB);
+      expect(await db.enrollment.count({ where: { userId: other.id, courseId: ids.bonus } })).toBe(0);
+      await db.user.delete({ where: { id: other.id } });
+    });
+
+    it('envios simultâneos não estouram o limite de tentativas', async () => {
+      const racer = await db.user.create({
+        data: { name: 'Corredor', email: `racer-${tag}@teste.local`, passwordHash: 'x' },
+      });
+      await access.grantAccess(racer.id, ids.courseA);
+      await db.activity.update({ where: { id: ids.activity }, data: { maxAttempts: 1 } });
+
+      const attempt = () =>
+        activities.submitAttempt(asUser(racer.id), ids.activity, [
+          { questionId: ids.question, selectedOptionIds: [ids.questionWrong] },
+        ]);
+      const results = await Promise.allSettled([attempt(), attempt(), attempt(), attempt()]);
+
+      expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+      expect(await db.activityAttempt.count({ where: { userId: racer.id, activityId: ids.activity } })).toBe(1);
+
+      await db.activity.update({ where: { id: ids.activity }, data: { maxAttempts: 5 } });
+      await db.user.delete({ where: { id: racer.id } });
+    });
+  });
+
 });

@@ -33,6 +33,13 @@ function hashPassword(password: string): Promise<string> {
   });
 }
 
+/**
+ * O seed é seguro de rodar de novo em produção: por padrão NÃO sobrescreve
+ * nada que o tutor tenha editado no painel (preços, textos, perfil, nome).
+ * Para reaplicar os textos do seed de propósito: SEED_FORCE_CONTENT=1.
+ */
+const FORCE_CONTENT = process.env.SEED_FORCE_CONTENT === '1';
+
 const TUTOR_EMAIL = process.env.SEED_TUTOR_EMAIL ?? 'amilton@araujolearn.com';
 const TUTOR_PASSWORD = process.env.SEED_TUTOR_PASSWORD ?? 'araujo2024';
 const STUDENT_EMAIL = process.env.SEED_STUDENT_EMAIL ?? 'aluno@araujolearn.com';
@@ -414,7 +421,9 @@ async function main() {
 
   const tutor = await db.user.upsert({
     where: { email: TUTOR_EMAIL },
-    update: { role: 'ADMIN', name: 'Eng. Amilton Araújo', headline: 'Engenheiro Civil · MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de Projetos', bio },
+    update: FORCE_CONTENT
+      ? { role: 'ADMIN', name: 'Eng. Amilton Araújo', headline: 'Engenheiro Civil · MSc em Perícia e Avaliação de Engenharia · MBA em Gestão de Projetos', bio }
+      : { role: 'ADMIN' },
     create: {
       name: 'Eng. Amilton Araújo',
       email: TUTOR_EMAIL,
@@ -449,7 +458,7 @@ async function main() {
 
   await db.tutorProfile.upsert({
     where: { userId: tutor.id },
-    update: tutorProfile,
+    update: FORCE_CONTENT ? tutorProfile : { isPrimary: true },
     create: { userId: tutor.id, ...tutorProfile },
   });
 
@@ -477,7 +486,7 @@ async function main() {
 
     const course = await db.course.upsert({
       where: { slug: seed.slug },
-      update: data,
+      update: FORCE_CONTENT ? data : {},
       create: {
         ...data,
         slug: seed.slug,

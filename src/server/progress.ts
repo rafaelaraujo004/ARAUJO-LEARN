@@ -41,13 +41,19 @@ export async function recordLessonProgress(
     select: {
       id: true,
       durationSeconds: true,
+      videoId: true,
+      video: { select: { durationSeconds: true } },
       module: { select: { courseId: true } },
     },
   });
   if (!lesson) throw new Error(`Aula inexistente: ${lessonId}`);
 
   const courseId = lesson.module.courseId;
-  const duration = Math.max(input.durationSeconds ?? 0, lesson.durationSeconds, 0);
+  // A duração que vale é a do servidor (vídeo registrado, ou a cadastrada na
+  // aula). A do cliente só serve de reserva: se ela mandasse, bastaria informar
+  // "duração 1s" para chegar a 100% sem assistir.
+  const trustedDuration = lesson.video?.durationSeconds ?? lesson.durationSeconds;
+  const duration = trustedDuration > 0 ? trustedDuration : Math.max(input.durationSeconds ?? 0, 0);
   const position = Math.max(0, Math.round(input.positionSeconds));
 
   const previous = await db.lessonProgress.findUnique({
@@ -61,7 +67,10 @@ export async function recordLessonProgress(
   const percent = Math.round(clamp(Math.max(rawPercent, previous?.percent ?? 0), 0, 100));
 
   const completed =
-    input.completed === true ||
+    // "Marcar como concluída" só vale para aula sem vídeo. Em aula com vídeo a
+    // conclusão vem do percentual assistido — senão bastaria um POST para
+    // concluir o curso sem assistir e emitir o certificado.
+    (input.completed === true && !lesson.videoId) ||
     previous?.status === 'COMPLETED' ||
     (duration > 0 && percent >= LESSON_COMPLETION_THRESHOLD);
 
@@ -171,6 +180,10 @@ export async function refreshCourseProgress(
 
   const now = new Date();
   const alreadyCompleted = Boolean(enrollment.completedAt);
+  // O recálculo é só contabilidade: NUNCA pode mexer no acesso. Se o tutor
+  // revogou (ou o prazo venceu), o status fica como está — do contrário um
+  // simples "emitir certificado" reativaria um acesso removido.
+  const accessOpen = enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED';
 
   await db.enrollment.update({
     where: { id: enrollment.id },
@@ -178,12 +191,13 @@ export async function refreshCourseProgress(
       progressPercent: percent,
       lastActivityAt: now,
       ...(lastLessonId ? { lastLessonId } : {}),
-      ...(completed && !alreadyCompleted
+      ...(accessOpen && completed && !alreadyCompleted
         ? { status: 'COMPLETED' as const, completedAt: now }
         : {}),
-      ...(!completed && enrollment.status === 'COMPLETED'
+      ...(accessOpen && !completed && enrollment.status === 'COMPLETED'
         ? { status: 'ACTIVE' as const, completedAt: null }
         : {}),
+      ...(!accessOpen && completed && !alreadyCompleted ? { completedAt: now } : {}),
     },
   });
 

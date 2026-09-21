@@ -18,7 +18,7 @@ import {
   tokenHash,
 } from '@/server/auth/session';
 import { passwordResetEmail, sendMail, welcomeEmail } from '@/server/mail';
-import { rateLimit } from '@/server/api';
+import { clientIpFromHeaders, rateLimit } from '@/server/api';
 import {
   changePasswordSchema,
   fieldErrors,
@@ -34,7 +34,7 @@ async function requestMeta() {
   const list = await headers();
   return {
     userAgent: list.get('user-agent'),
-    ip: list.get('x-forwarded-for')?.split(',')[0]?.trim() ?? list.get('x-real-ip') ?? null,
+    ip: clientIpFromHeaders(list),
   };
 }
 

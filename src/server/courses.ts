@@ -83,9 +83,9 @@ async function toCard(course: CourseCardRow): Promise<CourseCardData> {
 
 /** Imagem estática de fallback para cursos sem capa no bucket. */
 const STATIC_COVERS: Record<string, string> = {
-  'leitura-e-interpretacao-de-projetos-de-engenharia': '/img/cursos/leitura-projetos.svg',
-  'orcamento-preliminar-de-obras-civis': '/img/cursos/orcamento-obras.svg',
-  'legislacao-de-obra-e-sistema-crea': '/img/cursos/legislacao-crea.svg',
+  'leitura-e-interpretacao-de-projetos-de-engenharia': '/img/cursos/leitura-projetos.png',
+  'orcamento-preliminar-de-obras-civis': '/img/cursos/orcamento-obras.png',
+  'legislacao-de-obra-e-sistema-crea': '/img/cursos/legislacao-crea.png',
 };
 
 /** URL temporária da capa; fallback estático quando o curso ainda não tem imagem no bucket. */

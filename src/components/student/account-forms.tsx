@@ -10,6 +10,7 @@ import { Alert, Avatar, Card, CardHeader } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import {
   changePasswordAction,
+  logoutAction,
   removeAvatarAction,
   updateProfileAction,
   uploadAvatarAction,
@@ -219,7 +220,7 @@ export function AccountForms({
             <p className="text-sm font-semibold text-ink-900">Sair da conta</p>
             <p className="mt-0.5 text-sm text-ink-500">Encerra esta sessão no navegador.</p>
           </div>
-          <form action="/api/auth/logout" method="post">
+          <form action={logoutAction}>
             <Button type="submit" variant="ghost" size="sm">
               <LogOut aria-hidden className="size-4" />
               Sair
